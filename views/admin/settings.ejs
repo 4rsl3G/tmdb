@@ -1,0 +1,24 @@
+<div class="section-head aos">
+  <h2 class="h2">Settings</h2>
+  <% if (saved) { %><span class="pill">Saved</span><% } %>
+</div>
+
+<div class="hero-card aos zoom">
+  <form method="post" action="<%= adminPath %>/settings" style="display:grid;gap:10px;">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <label class="muted">Site Name</label>
+    <input name="site_name" value="<%= site_name || "" %>">
+
+    <label class="muted">Home Title</label>
+    <input name="home_title" value="<%= home_title || "" %>">
+
+    <label class="muted">Home Description</label>
+    <textarea name="home_desc" rows="3"><%= home_desc || "" %></textarea>
+
+    <label class="muted">Smartlink URL</label>
+    <input name="smartlink_url" value="<%= smartlink_url || "" %>" required>
+
+    <button class="btn primary" type="submit">Save</button>
+  </form>
+</div>
