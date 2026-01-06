@@ -1,0 +1,76 @@
+<div id="pjax-page"
+     data-title="<%= pageMeta.title %>"
+     data-desc="<%= pageMeta.desc %>"
+     data-canonical="<%= pageMeta.canonical %>">
+
+  <section class="hero">
+    <div class="hero-card aos zoom pulse">
+      <h1 class="hero-title"><%= homeTitle %></h1>
+      <p class="hero-sub"><%= homeDesc %></p>
+      <div class="hero-actions">
+        <a class="btn primary" href="#list" data-pjax>Browse</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="k"><%= posts.length %></div><div class="l">featured titles</div></div>
+        <div class="stat"><div class="k">Green</div><div class="l">branded UI</div></div>
+        <div class="stat"><div class="k">Fast</div><div class="l">SEO-ready</div></div>
+      </div>
+    </div>
+
+    <div class="hero-card aos right sweep">
+      <h2 class="h2" style="margin-top:0;">Smartlink</h2>
+      <p class="muted">First movie click redirects to your Smartlink (one-time cookie).</p>
+      <div class="pill"><span class="brand-mark small"></span><span>No gradient • Premium motion</span></div>
+    </div>
+  </section>
+
+  <section class="rail aos zoom">
+    <div class="section-head">
+      <h2 class="h2">Poster Rail</h2>
+      <span class="pill">Swipe / drag</span>
+    </div>
+
+    <div class="poster-rail" id="posterRail">
+      <% posts.slice(0,18).forEach(p => { %>
+        <a class="poster-card sweep floaty" href="/p/<%= p.slug %>" data-pjax>
+          <% if (p.poster_url) { %>
+            <img loading="lazy" referrerpolicy="no-referrer" src="<%= p.poster_url %>" alt="<%= p.title %> poster"/>
+          <% } else { %>
+            <div class="muted" style="padding:20px;">No image</div>
+          <% } %>
+          <div class="poster-cap">
+            <div class="t"><%= p.title %></div>
+            <div class="m"><%= p.release_year || "" %> • ⭐ <%= (p.vote_average||"").toString().slice(0,3) %></div>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+  </section>
+
+  <div class="section-head aos left" id="list">
+    <h2 class="h2">Latest Movies</h2>
+    <span class="pill">Tap to open</span>
+  </div>
+
+  <section class="grid stagger aos">
+    <% posts.forEach(p => { %>
+      <a class="card tilt" data-tilt href="/p/<%= p.slug %>" data-pjax>
+        <div class="card-media">
+          <% if (p.poster_url) { %>
+            <img loading="lazy" referrerpolicy="no-referrer" src="<%= p.poster_url %>" alt="<%= p.title %> poster"/>
+          <% } else { %>
+            <div class="muted">No image</div>
+          <% } %>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title"><%= p.title %></h3>
+          <p class="card-excerpt"><%= (p.excerpt||"").slice(0, 140) %></p>
+          <div class="card-meta">
+            <span class="tag"><%= p.release_year || "Movie" %></span>
+            <span>⭐ <%= (p.vote_average||"").toString().slice(0,3) %></span>
+          </div>
+        </div>
+      </a>
+    <% }) %>
+  </section>
+</div>
