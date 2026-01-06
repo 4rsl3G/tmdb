@@ -15,15 +15,18 @@ function verifyLogin(u, p) {
 }
 
 router.get("/login", (req, res) => {
+  if (req.session?.isAdmin) return res.redirect(cfg.adminPath);
   res.render("admin/login", { layout: "layouts/admin", error: null });
 });
+
 router.post("/login", (req, res) => {
   if (verifyLogin(req.body.username, req.body.password)) {
     req.session.isAdmin = true;
-    return res.redirect(`${cfg.adminPath}`);
+    return res.redirect(cfg.adminPath);
   }
   res.render("admin/login", { layout: "layouts/admin", error: "Invalid login." });
 });
+
 router.post("/logout", (req, res) => {
   req.session.destroy(() => res.redirect(`${cfg.adminPath}/login`));
 });
@@ -44,7 +47,6 @@ router.get("/settings", requireAdmin, async (req, res) => {
   const rows = await Setting.findAll();
   const s = {};
   rows.forEach(r => s[r.key] = r.value);
-
   res.render("admin/settings", { layout: "layouts/admin", saved: false, s });
 });
 
@@ -60,7 +62,6 @@ router.post("/settings", requireAdmin, async (req, res) => {
   for (const k of keys) {
     await Setting.upsert({ key: k, value: String(req.body[k] ?? "") });
   }
-
   clearSettingsCache();
 
   const rows = await Setting.findAll();
