@@ -1,10 +1,10 @@
-<div class="section-head aos">
+<div class="section-head" data-aos="fade-up">
   <h2 class="h2">Dashboard</h2>
-  <span class="pill">Auto Import Active</span>
+  <span class="pill">Admin Control</span>
 </div>
 
-<section class="grid" style="grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;">
-  <div class="hero-card aos zoom"><div class="muted">Total</div><div style="font-size:34px;font-weight:800;"><%= count %></div></div>
-  <div class="hero-card aos zoom"><div class="muted">Published</div><div style="font-size:34px;font-weight:800;"><%= pub %></div></div>
-  <div class="hero-card aos zoom"><div class="muted">Draft</div><div style="font-size:34px;font-weight:800;"><%= draft %></div></div>
-</section>
+<div class="row g-3" data-aos="fade-up">
+  <div class="col-md-4"><div class="hero-card"><div class="muted">Total</div><div class="big"><%= count %></div></div></div>
+  <div class="col-md-4"><div class="hero-card"><div class="muted">Published</div><div class="big"><%= pub %></div></div></div>
+  <div class="col-md-4"><div class="hero-card"><div class="muted">Draft</div><div class="big"><%= draft %></div></div></div>
+</div>
