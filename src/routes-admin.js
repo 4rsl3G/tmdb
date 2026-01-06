@@ -1,5 +1,6 @@
 const express = require("express");
 const { Setting, Post } = require("./models");
+const { clearSettingsCache } = require("./settings-cache");
 const cfg = require("./config");
 
 const router = express.Router();
@@ -40,20 +41,33 @@ router.get("/posts", requireAdmin, async (req, res) => {
 });
 
 router.get("/settings", requireAdmin, async (req, res) => {
-  const get = async (k, fb="") => (await Setting.findByPk(k))?.value ?? fb;
-  res.render("admin/settings", {
-    layout: "layouts/admin",
-    saved: false,
-    site_name: await get("site_name",""),
-    home_title: await get("home_title",""),
-    home_desc: await get("home_desc",""),
-    smartlink_url: await get("smartlink_url","")
-  });
+  const rows = await Setting.findAll();
+  const s = {};
+  rows.forEach(r => s[r.key] = r.value);
+
+  res.render("admin/settings", { layout: "layouts/admin", saved: false, s });
 });
+
 router.post("/settings", requireAdmin, async (req, res) => {
-  const fields = ["site_name","home_title","home_desc","smartlink_url"];
-  for (const f of fields) await Setting.upsert({ key: f, value: req.body[f] || "" });
-  res.render("admin/settings", { layout: "layouts/admin", saved: true, ...req.body });
+  const keys = [
+    "site_name","home_title","home_desc","accent_hex",
+    "smartlink_url",
+    "tmdb_api_key","tmdb_lang","tmdb_region",
+    "auto_import_cron","import_source","import_pages",
+    "auto_publish","min_overview_len","min_vote_count","require_poster"
+  ];
+
+  for (const k of keys) {
+    await Setting.upsert({ key: k, value: String(req.body[k] ?? "") });
+  }
+
+  clearSettingsCache();
+
+  const rows = await Setting.findAll();
+  const s = {};
+  rows.forEach(r => s[r.key] = r.value);
+
+  res.render("admin/settings", { layout: "layouts/admin", saved: true, s });
 });
 
 module.exports = router;
