@@ -1,14 +1,10 @@
-const { Setting, Post } = require("./models");
-const cfg = require("./config");
+const { Post } = require("./models");
+const { baseUrl } = require("./config");
 
-async function getSiteName() {
-  return (await Setting.findByPk("site_name"))?.value || "GreenPulse Movies";
-}
-
-function abs(urlPath) {
-  const base = cfg.baseUrl.replace(/\/+$/,"");
-  const p = urlPath.startsWith("/") ? urlPath : `/${urlPath}`;
-  return base + p;
+function abs(path) {
+  const b = baseUrl.replace(/\/+$/,"");
+  const p = path.startsWith("/") ? path : `/${path}`;
+  return b + p;
 }
 
 async function sitemapXml() {
@@ -44,4 +40,4 @@ Sitemap: ${abs("/sitemap.xml")}
 `;
 }
 
-module.exports = { abs, getSiteName, sitemapXml, robotsTxt };
+module.exports = { abs, sitemapXml, robotsTxt };
