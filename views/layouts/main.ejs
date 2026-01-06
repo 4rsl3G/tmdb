@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+  <title><%= pageMeta?.title || siteName %></title>
+  <meta name="description" content="<%= pageMeta?.desc || homeDesc %>"/>
+  <link rel="canonical" href="<%= pageMeta?.canonical || canonical %>"/>
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:title" content="<%= pageMeta?.title || siteName %>"/>
+  <meta property="og:description" content="<%= pageMeta?.desc || homeDesc %>"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="<%= pageMeta?.canonical || canonical %>"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- CDN libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+
+  <link rel="stylesheet" href="/ui.css"/>
+</head>
+<body>
+  <div class="bg"><div class="bg-noise" aria-hidden="true"></div></div>
+
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="/" data-pjax>
+        <span class="brand-mark pulse"></span>
+        <span class="brand-name"><%= siteName %></span>
+      </a>
+      <nav class="nav">
+        <a class="nav-link" href="/" data-pjax>Home</a>
+      </nav>
+      <button class="icon-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">
+        <span class="icon-lines"></span>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu" hidden>
+      <div class="container mobile-menu-inner">
+        <a class="nav-link" href="/" data-pjax>Home</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" id="pjax-root">
+    <%- body %>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="foot-left">
+        <div class="brand-mini">
+          <span class="brand-mark small"></span>
+          <span><%= siteName %></span>
+        </div>
+        <small class="muted">© <%= new Date().getFullYear() %></small>
+      </div>
+      <div class="foot-right">
+        <small class="muted">This product uses the TMDB API but is not endorsed or certified by TMDB.</small>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/ui.js"></script>
+</body>
+</html>
