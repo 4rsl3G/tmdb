@@ -4,13 +4,13 @@ const path = require("path");
 const expressLayouts = require("express-ejs-layouts");
 const { setupMiddleware, injectGlobals } = require("./middleware");
 const cfg = require("./config");
-
 const publicRoutes = require("./routes-public");
 const adminRoutes = require("./routes-admin");
 const { sitemapXml, robotsTxt } = require("./seo");
 
 function createApp() {
   const app = express();
+
   app.set("view engine", "ejs");
   app.set("views", path.join(__dirname, "..", "views"));
 
@@ -24,13 +24,8 @@ function createApp() {
   setupMiddleware(app);
   app.use(injectGlobals);
 
-  // SEO endpoints
-  app.get("/robots.txt", (req, res) => {
-    res.type("text/plain").send(robotsTxt());
-  });
-  app.get("/sitemap.xml", async (req, res) => {
-    res.type("application/xml").send(await sitemapXml());
-  });
+  app.get("/robots.txt", (req, res) => res.type("text/plain").send(robotsTxt()));
+  app.get("/sitemap.xml", async (req, res) => res.type("application/xml").send(await sitemapXml()));
 
   app.use("/", publicRoutes);
   app.use(cfg.adminPath, adminRoutes);
