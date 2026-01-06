@@ -489,3 +489,9 @@ a{ color:inherit; }
   .floaty,.pulse,.sweep{ animation:none!important; }
   .cardx,.poster-card img{ transition:none!important; }
 }
+
+/* === AOS FAILSAFE: jangan bikin halaman blank kalau AOS gagal init === */
+html:not(.aos-ok) [data-aos]{
+  opacity: 1 !important;
+  transform: none !important;
+}
