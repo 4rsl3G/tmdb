@@ -1,13 +1,20 @@
-<div class="hero-card aos zoom" style="max-width:520px;margin:24px auto;">
-  <h1 class="h2" style="margin-top:0;">Admin Login</h1>
-  <% if (error) { %><p style="color:#ff8a8a;"><%= error %></p><% } %>
+<div class="hero-card mx-auto" style="max-width:520px" data-aos="zoom-in">
+  <h1 class="h2 mb-2">Admin Login</h1>
+  <% if (error) { %><div class="alert alert-danger py-2"><%= error %></div><% } %>
 
-  <form method="post" action="<%= adminPath %>/login" style="display:grid;gap:10px;">
+  <form method="post" action="<%= adminPath %>/login" class="d-grid gap-2">
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <label class="muted">Username</label>
-    <input name="username" required>
-    <label class="muted">Password</label>
-    <input type="password" name="password" required>
-    <button class="btn primary" type="submit">Login</button>
+
+    <div>
+      <label class="form-label muted">Username</label>
+      <input class="form-control form-control-lg" name="username" required>
+    </div>
+
+    <div>
+      <label class="form-label muted">Password</label>
+      <input class="form-control form-control-lg" type="password" name="password" required>
+    </div>
+
+    <button class="btn btn-lg btn-success mt-2" type="submit">Login</button>
   </form>
 </div>
