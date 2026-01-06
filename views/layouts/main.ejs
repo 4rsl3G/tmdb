@@ -34,15 +34,7 @@
     <div class="bg-noise" aria-hidden="true"></div>
   </div>
 
-  <!-- Overlay loader (must be above content, but hidden with d-none) -->
-  <div id="overlay" class="overlay d-none" aria-hidden="true">
-    <div class="overlay-card" role="status" aria-live="polite">
-      <div class="spinner-grow" role="status" aria-hidden="true"></div>
-      <div class="overlay-text">Loading…</div>
-    </div>
-  </div>
-
-  <!-- Foreground app layer (always above bg) -->
+  <!-- App layer (always above bg) -->
   <div class="app-shell" style="position:relative; z-index:10;">
 
     <header class="topbar">
@@ -56,7 +48,8 @@
           <a class="nav-link" href="/" data-pjax>Home</a>
         </nav>
 
-        <button class="icon-btn d-md-none" id="menuBtn" aria-label="Open menu" aria-expanded="false" type="button">
+        <button class="icon-btn d-md-none" id="menuBtn"
+                aria-label="Open menu" aria-expanded="false" type="button">
           <span class="icon-lines"></span>
         </button>
       </div>
