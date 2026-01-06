@@ -1,0 +1,72 @@
+<%
+  const genres = post.genres_json ? JSON.parse(post.genres_json) : [];
+  const cast = post.cast_json ? JSON.parse(post.cast_json) : [];
+%>
+
+<div id="pjax-page"
+     data-title="<%= pageMeta.title %>"
+     data-desc="<%= pageMeta.desc %>"
+     data-canonical="<%= pageMeta.canonical %>">
+
+  <section class="post">
+    <div class="post-shell aos zoom">
+      <div class="post-hero">
+        <div>
+          <h1 class="post-title"><%= post.title %></h1>
+          <div class="post-meta">
+            <span class="tag"><%= post.release_year || "Movie" %></span>
+            <span class="muted"><%= (post.release_date || "").slice(0,10) %></span>
+            <span class="muted">⭐ <%= (post.vote_average||"").toString().slice(0,3) %> (<%= post.vote_count||0 %>)</span>
+          </div>
+
+          <div style="margin-top:10px;" class="pill">
+            <span>Genres:</span>
+            <span><%= genres.map(g=>g.name).join(", ") || "-" %></span>
+          </div>
+
+          <div style="margin-top:12px;">
+            <% if (post.trailer_key) { %>
+              <a class="btn primary" href="https://www.youtube.com/watch?v=<%= post.trailer_key %>" target="_blank" rel="nofollow noopener">Watch Trailer</a>
+            <% } %>
+            <a class="btn ghost" href="/" data-pjax>Back</a>
+          </div>
+        </div>
+
+        <div class="poster sweep">
+          <% if (post.poster_url) { %>
+            <img loading="lazy" referrerpolicy="no-referrer" src="<%= post.poster_url %>" alt="<%= post.title %> poster"/>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="post-content">
+        <%- sanitize(post.content) %>
+        <% if (post.director || cast.length) { %><hr/><% } %>
+        <% if (post.director) { %><p><strong>Director:</strong> <%= post.director %></p><% } %>
+        <% if (cast.length) { %><p><strong>Top Cast:</strong> <%= cast.map(x=>x.name).join(", ") %></p><% } %>
+      </div>
+    </div>
+  </section>
+
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Movie",
+    "name":"<%- (post.title||'').replace(/"/g,'\\"') %>",
+    "description":"<%- (pageMeta.desc||'').replace(/"/g,'\\"') %>",
+    "image":"<%- (post.poster_url||'').replace(/"/g,'\\"') %>",
+    "datePublished":"<%- (post.release_date||'').slice(0,10) %>",
+    "duration":"PT<%- (post.runtime||0) %>M",
+    "genre": <%- post.genres_json ? post.genres_json : "[]" %>,
+    "aggregateRating":{
+      "@type":"AggregateRating",
+      "ratingValue":"<%- (post.vote_average||'') %>",
+      "bestRating":"10",
+      "ratingCount":"<%- (post.vote_count||'') %>"
+    },
+    "director":{"@type":"Person","name":"<%- (post.director||'').replace(/"/g,'\\"') %>"},
+    "inLanguage":"en-US"
+  }
+  </script>
+</div>
