@@ -18,8 +18,9 @@ router.get("/", async (req, res) => {
   const canonical = abs("/");
 
   const data = { posts, pageMeta: { title, desc, canonical } };
+
   if (isAjax(req)) return res.render("partials/home", { ...data, layout: false });
-  return res.render("partials/home", { ...data, layout: "layouts/main" });
+  return res.render("partials/home", data); // <== pakai default layout
 });
 
 router.get("/go/smartlink", async (req, res) => {
@@ -36,10 +37,9 @@ router.get("/p/:slug", async (req, res) => {
   if (!post) {
     const data = { pageMeta: { title: `Not Found • ${res.locals.siteName}`, desc: "Page not found.", canonical } };
     if (isAjax(req)) return res.status(404).render("partials/notfound", { ...data, layout: false });
-    return res.status(404).render("partials/notfound", { ...data, layout: "layouts/main" });
+    return res.status(404).render("partials/notfound", data);
   }
 
-  // one-time smartlink redirect
   if (!req.cookies.visited_movie) {
     res.cookie("visited_movie", "1", { maxAge: 1000*60*60*24*30, httpOnly: true });
     return res.redirect("/go/smartlink");
@@ -50,7 +50,7 @@ router.get("/p/:slug", async (req, res) => {
   const data = { post, pageMeta: { title, desc, canonical: abs(`/p/${post.slug}`) } };
 
   if (isAjax(req)) return res.render("partials/post", { ...data, layout: false });
-  return res.render("partials/post", { ...data, layout: "layouts/main" });
+  return res.render("partials/post", data);
 });
 
 module.exports = router;
