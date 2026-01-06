@@ -25,17 +25,25 @@
   }
 
   function safeInitAOS(){
-    try {
-      if (window.AOS && typeof window.AOS.init === "function") {
-        window.AOS.init({
-          once: false,
-          mirror: true,
-          duration: 650,
-          easing: "ease-out-cubic"
-        });
-      }
-    } catch (e) {}
-  }
+  try {
+    if (window.AOS && typeof window.AOS.init === "function") {
+      window.AOS.init({
+        once: false,
+        mirror: true,
+        duration: 650,
+        easing: "ease-out-cubic"
+      });
+
+      // tandai AOS sukses agar failsafe CSS tidak aktif
+      document.documentElement.classList.add("aos-ok");
+
+      // penting: refresh untuk halaman yang di-render / di-inject ulang (PJAX)
+      setTimeout(() => {
+        try { window.AOS.refreshHard(); } catch(e) {}
+      }, 50);
+    }
+  } catch (e) {}
+}
 
   function initTilt(){
     // tilt hanya untuk public cards
