@@ -1,0 +1,13 @@
+<div class="hero-card aos zoom" style="max-width:520px;margin:24px auto;">
+  <h1 class="h2" style="margin-top:0;">Admin Login</h1>
+  <% if (error) { %><p style="color:#ff8a8a;"><%= error %></p><% } %>
+
+  <form method="post" action="<%= adminPath %>/login" style="display:grid;gap:10px;">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <label class="muted">Username</label>
+    <input name="username" required>
+    <label class="muted">Password</label>
+    <input type="password" name="password" required>
+    <button class="btn primary" type="submit">Login</button>
+  </form>
+</div>
