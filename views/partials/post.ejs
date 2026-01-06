@@ -1,71 +1,74 @@
-<%
-  const genres = post.genres_json ? JSON.parse(post.genres_json) : [];
-  const cast = post.cast_json ? JSON.parse(post.cast_json) : [];
-%>
-
 <div id="pjax-page"
-     data-title="<%= pageMeta.title %>"
-     data-desc="<%= pageMeta.desc %>"
-     data-canonical="<%= pageMeta.canonical %>">
+     data-title="<%= pageMeta?.title %>"
+     data-desc="<%= pageMeta?.desc %>"
+     data-canonical="<%= pageMeta?.canonical %>">
 
-  <section class="post" data-aos="fade-up">
-    <div class="post-shell">
-      <div class="post-hero">
-        <div>
-          <h1 class="post-title"><%= post.title %></h1>
-          <div class="post-meta">
-            <span class="tag"><%= post.release_year || "Movie" %></span>
-            <span class="muted"><%= (post.release_date || "").slice(0,10) %></span>
-            <span class="muted">⭐ <%= (post.vote_average||"").toString().slice(0,3) %> (<%= post.vote_count||0 %>)</span>
-          </div>
+  <article class="postWrap" data-aos="fade-up">
 
-          <div class="pill mt-2">
-            <span>Genres:</span>
-            <span><%= genres.map(g=>g.name).join(", ") || "-" %></span>
-          </div>
-
-          <div class="d-flex gap-2 flex-wrap mt-3">
-            <% if (post.trailer_key) { %>
-              <a class="btnx btnx-primary" href="https://www.youtube.com/watch?v=<%= post.trailer_key %>" target="_blank" rel="nofollow noopener">Watch Trailer</a>
+    <div class="postHero shine sweep">
+      <div class="postHeroGrid">
+        <div class="postPoster tilt" data-tilt>
+          <div class="posterFrame posterFrameBig">
+            <% if (post.poster_url) { %>
+              <img loading="lazy" referrerpolicy="no-referrer" src="<%= post.poster_url %>" alt="<%= post.title %> poster"/>
+            <% } else { %>
+              <div class="poster-fallback">No poster</div>
             <% } %>
-            <a class="btnx btnx-ghost" href="/" data-pjax>Back</a>
           </div>
         </div>
 
-        <div class="poster sweep" data-aos="zoom-in">
-          <% if (post.poster_url) { %>
-            <img loading="lazy" referrerpolicy="no-referrer" src="<%= post.poster_url %>" alt="<%= post.title %> poster"/>
-          <% } %>
-        </div>
-      </div>
+        <div class="postInfo">
+          <div class="postTitleRow">
+            <h1 class="postTitle"><%= post.title %></h1>
+            <span class="pill pill-hot"><span class="miniDot"></span>Watch</span>
+          </div>
 
-      <div class="post-content">
-        <%- sanitize(post.content) %>
-        <% if (post.director || cast.length) { %><hr/><% } %>
-        <% if (post.director) { %><p><strong>Director:</strong> <%= post.director %></p><% } %>
-        <% if (cast.length) { %><p><strong>Top Cast:</strong> <%= cast.map(x=>x.name).join(", ") %></p><% } %>
+          <div class="postMetaRow">
+            <span class="pill"><span class="miniDot"></span><%= post.release_year || "Movie" %></span>
+            <% if (post.vote_average) { %>
+              <span class="pill"><span class="miniDot"></span>⭐ <%= (post.vote_average||"").toString().slice(0,3) %></span>
+            <% } %>
+            <% if (post.runtime) { %>
+              <span class="pill"><span class="miniDot"></span><%= post.runtime %> min</span>
+            <% } %>
+          </div>
+
+          <p class="postLead"><%= (post.excerpt || "").slice(0, 220) %></p>
+
+          <div class="postCtas">
+            <a class="btnx btnx-primary btnx-big" href="#" onclick="history.back();return false;">Back</a>
+            <a class="btnx btnx-ghost btnx-big" href="/" data-pjax>Home</a>
+          </div>
+
+          <div class="postNote muted small">
+            Tip: Scroll for details. Animations are lightweight and mobile-friendly.
+          </div>
+        </div>
       </div>
     </div>
-  </section>
 
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"Movie",
-    "name":"<%- (post.title||'').replace(/"/g,'\\"') %>",
-    "description":"<%- (pageMeta.desc||'').replace(/"/g,'\\"') %>",
-    "image":"<%- (post.poster_url||'').replace(/"/g,'\\"') %>",
-    "datePublished":"<%- (post.release_date||'').slice(0,10) %>",
-    "duration":"PT<%- (post.runtime||0) %>M",
-    "genre": <%- post.genres_json ? post.genres_json : "[]" %>,
-    "aggregateRating":{
-      "@type":"AggregateRating",
-      "ratingValue":"<%- (post.vote_average||'') %>",
-      "bestRating":"10",
-      "ratingCount":"<%- (post.vote_count||'') %>"
-    },
-    "director":{"@type":"Person","name":"<%- (post.director||'').replace(/"/g,'\\"') %>"},
-    "inLanguage":"en-US"
-  }
-  </script>
+    <section class="postBody" data-aos="fade-up" data-aos-delay="120">
+      <% if (post.content) { %>
+        <div class="postContent"><%- post.content %></div>
+      <% } else { %>
+        <div class="postContent">
+          <p><%= post.excerpt || "Details are being prepared." %></p>
+        </div>
+      <% } %>
+    </section>
+
+    <!-- JSON-LD (aman, ringkas) -->
+    <script type="application/ld+json">
+      <%- JSON.stringify({
+        "@context":"https://schema.org",
+        "@type":"Movie",
+        "name": post.title,
+        "datePublished": post.release_year ? String(post.release_year) : undefined,
+        "image": post.poster_url || undefined,
+        "aggregateRating": post.vote_average ? { "@type":"AggregateRating", "ratingValue": Number(post.vote_average), "ratingCount": Number(post.vote_count || 1) } : undefined,
+        "url": pageMeta?.canonical || undefined
+      }) %>
+    </script>
+
+  </article>
 </div>
