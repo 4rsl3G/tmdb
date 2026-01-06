@@ -1,18 +1,18 @@
-<div class="section-head aos">
-  <h2 class="h2">Posts (Auto)</h2>
+<div class="section-head" data-aos="fade-up">
+  <h2 class="h2">Posts</h2>
   <span class="pill">latest 200</span>
 </div>
 
-<section class="grid" style="grid-template-columns:1fr;gap:10px;">
+<div class="d-grid gap-2">
   <% posts.forEach(p => { %>
-    <div class="hero-card aos zoom">
-      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+    <div class="hero-card" data-aos="fade-up">
+      <div class="d-flex justify-content-between flex-wrap gap-2">
         <div>
-          <div style="font-weight:800;"><%= p.title %></div>
-          <div class="muted">/<%= p.slug %> • <%= p.status %></div>
+          <div class="fw-bold"><%= p.title %></div>
+          <div class="muted small">/<%= p.slug %> • <%= p.status %></div>
         </div>
-        <a class="btn ghost" href="/p/<%= p.slug %>" target="_blank" rel="noopener">Open</a>
+        <a class="btn btn-sm btn-outline-light" href="/p/<%= p.slug %>" target="_blank" rel="noopener">Open</a>
       </div>
     </div>
   <% }) %>
-</section>
+</div>
