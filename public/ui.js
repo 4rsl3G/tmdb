@@ -1,5 +1,8 @@
 (() => {
   const overlay = document.getElementById("overlay");
+  const root = document.getElementById("pjax-root");
+
+  const isAdminPage = location.pathname.includes("/admin") || document.body.classList.contains("is-admin");
 
   function showOverlay(){
     if (!overlay) return;
@@ -10,7 +13,7 @@
     overlay.classList.add("d-none");
   }
 
-  // menu mobile
+  // Mobile menu (works for both)
   const btn = document.getElementById("menuBtn");
   const menu = document.getElementById("mobileMenu");
   if (btn && menu) {
@@ -21,19 +24,26 @@
     });
   }
 
-  function initAOS(){
-    if (!window.AOS) return;
-    AOS.init({
-      once: false,
-      mirror: true,
-      duration: 650,
-      easing: "ease-out-cubic"
-    });
+  function safeInitAOS(){
+    try {
+      if (window.AOS && typeof window.AOS.init === "function") {
+        window.AOS.init({
+          once: false,
+          mirror: true,
+          duration: 650,
+          easing: "ease-out-cubic"
+        });
+      }
+    } catch (e) {}
   }
 
   function initTilt(){
+    // tilt hanya untuk public cards
+    if (isAdminPage) return;
+
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) return;
+
     const els = document.querySelectorAll("[data-tilt]");
     els.forEach(el => {
       let raf = null;
@@ -53,6 +63,8 @@
   }
 
   function initRailDrag(){
+    if (isAdminPage) return;
+
     const rail = document.getElementById("posterRail");
     if (!rail) return;
     let down=false, startX=0, startScroll=0;
@@ -91,55 +103,63 @@
       document.head.appendChild(linkCanon);
     }
     linkCanon.setAttribute("href", canonical);
-
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    if (ogTitle) ogTitle.setAttribute("content", title);
-    const ogDesc = document.querySelector('meta[property="og:description"]');
-    if (ogDesc) ogDesc.setAttribute("content", desc);
-    const ogUrl = document.querySelector('meta[property="og:url"]');
-    if (ogUrl) ogUrl.setAttribute("content", canonical);
   }
 
   function reinit(){
-    initAOS();
+    safeInitAOS();
     initTilt();
     initRailDrag();
   }
 
+  // ALWAYS: hide overlay on load (prevent “stuck overlay”)
+  window.addEventListener("load", () => hideOverlay());
+  window.addEventListener("pageshow", () => hideOverlay());
+
   // initial
   reinit();
 
-  // PJAX
-  const root = document.getElementById("pjax-root");
-  if (root && window.jQuery) {
-    function load(url, push=true){
-      showOverlay();
-      $.ajax({
-        url,
-        headers: { "X-Requested-With": "XMLHttpRequest" }
-      }).done((html) => {
-        root.innerHTML = html;
-        if (push) history.pushState({ url }, "", url);
-        updateHeadFromPjax();
-        reinit();
-        window.scrollTo({ top:0, behavior:"smooth" });
-      }).fail(() => {
-        window.location.href = url;
-      }).always(() => {
-        setTimeout(hideOverlay, 120);
-      });
-    }
+  // ===== PJAX only on PUBLIC pages =====
+  // Admin pages: disable PJAX entirely to avoid replacing admin DOM.
+  if (!root || !window.jQuery || isAdminPage) return;
 
-    $(document).on("click", "a[data-pjax]", function(e){
-      const href = $(this).attr("href");
-      if (!href || href.startsWith("http")) return;
-      e.preventDefault();
-      load(href, true);
-    });
+  function load(url, push=true){
+    showOverlay();
 
-    window.addEventListener("popstate", (e) => {
-      const url = (e.state && e.state.url) ? e.state.url : window.location.pathname;
-      load(url, false);
+    $.ajax({
+      url,
+      headers: { "X-Requested-With": "XMLHttpRequest" }
+    })
+    .done((html) => {
+      root.innerHTML = html;
+      if (push) history.pushState({ url }, "", url);
+      updateHeadFromPjax();
+      reinit();
+      try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch { window.scrollTo(0,0); }
+    })
+    .fail(() => {
+      window.location.href = url;
+    })
+    .always(() => {
+      // overlay pasti ditutup walau ada error render
+      setTimeout(hideOverlay, 120);
     });
   }
+
+  $(document).on("click", "a[data-pjax]", function(e){
+    const href = $(this).attr("href");
+    if (!href) return;
+
+    // block external & admin links
+    if (href.startsWith("http")) return;
+    if (href.includes("/admin")) return;
+
+    e.preventDefault();
+    load(href, true);
+  });
+
+  window.addEventListener("popstate", (e) => {
+    const url = (e.state && e.state.url) ? e.state.url : window.location.pathname;
+    load(url, false);
+  });
+
 })();
