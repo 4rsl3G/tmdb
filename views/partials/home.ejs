@@ -3,149 +3,51 @@
      data-desc="<%= pageMeta.desc %>"
      data-canonical="<%= pageMeta.canonical %>">
 
-  <% if (!posts || posts.length === 0) { %>
-    <section class="hero row g-3 align-items-stretch">
-      <div class="col-12">
-        <div class="hero-card" data-aos="zoom-in">
-          <h1 class="hero-title"><%= homeTitle %></h1>
-          <p class="hero-sub"><%= homeDesc %></p>
-          <div class="pill mt-2"><span class="brand-mark small"></span><span>No titles yet. Add TMDb key in Admin → Settings.</span></div>
-        </div>
-      </div>
-    </section>
-  <% } %>
-
-  <section class="hero row g-3 align-items-stretch">
-    <div class="col-lg-7">
-      <div class="hero-card h-100" data-aos="zoom-in">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-          <h1 class="hero-title mb-0"><%= homeTitle %></h1>
-          <span class="pill"><span class="brand-mark small"></span><span>EN • <%= (new Date()).getFullYear() %></span></span>
-        </div>
-
-        <p class="hero-sub mt-2"><%= homeDesc %></p>
-
-        <!-- Faux search UI (no backend needed) -->
-        <div class="mt-3" data-aos="fade-up" data-aos-delay="80">
-          <div class="d-flex gap-2 flex-wrap">
-            <div class="w-100" style="max-width:520px">
-              <div class="input-group input-group-lg">
-                <span class="input-group-text" style="background:rgba(255,255,255,.02);border-color:rgba(234,255,244,.10);color:rgba(234,255,244,.7)">🔎</span>
-                <input class="form-control"
-                       placeholder="Search titles (coming soon)"
-                       disabled
-                       style="background:rgba(255,255,255,.02);border-color:rgba(234,255,244,.10);color:rgba(234,255,244,.85)">
-              </div>
-              <div class="muted small mt-2">Tip: swipe the poster rail, then open a title.</div>
-            </div>
-          </div>
-
-          <div class="d-flex gap-2 flex-wrap mt-3">
-            <a class="btnx btnx-primary" href="#rail" data-pjax>Explore</a>
-            <a class="btnx btnx-ghost" href="#list" data-pjax>Latest</a>
-            <a class="btnx btnx-ghost" href="/sitemap.xml" target="_blank" rel="noopener">Sitemap</a>
-          </div>
-        </div>
-
-        <!-- chips -->
-        <div class="d-flex gap-2 flex-wrap mt-3" data-aos="fade-up" data-aos-delay="140">
-          <span class="pill">Trending</span>
-          <span class="pill">Popular</span>
-          <span class="pill">Top Rated</span>
-          <span class="pill">Now Playing</span>
-        </div>
-
-        <div class="stats mt-3" data-aos="fade-up" data-aos-delay="180">
-          <div class="stat">
-            <div class="k"><%= posts ? posts.length : 0 %></div>
-            <div class="l">featured titles</div>
-          </div>
-          <div class="stat">
-            <div class="k">Fast</div>
-            <div class="l">mobile-first</div>
-          </div>
-          <div class="stat">
-            <div class="k">Smooth</div>
-            <div class="l">micro motion</div>
-          </div>
-        </div>
-      </div>
+  <div class="home-head" data-aos="fade-down">
+    <div class="home-title">
+      <h1 class="home-h1"><%= homeTitle %></h1>
+      <p class="home-sub"><%= homeDesc %></p>
     </div>
 
-    <div class="col-lg-5">
-      <div class="hero-card h-100" data-aos="fade-left">
-        <h2 class="h2 mb-2">Discover</h2>
-        <p class="muted mb-2">Swipe posters, open a title, enjoy smooth motion.</p>
-
-        <div class="d-flex gap-2 flex-wrap">
-          <div class="pill"><span class="brand-mark small"></span><span>Full responsive • No gradient</span></div>
-          <div class="pill"><span class="brand-mark small"></span><span>Lazy load • Lightweight</span></div>
-        </div>
-
-        <div class="mt-3">
-          <div class="muted small">Hint: first movie click can redirect to smartlink (cookie-based).</div>
-        </div>
-
-        <div class="mt-3" data-aos="fade-up" data-aos-delay="120">
-          <div class="d-flex gap-2 flex-wrap">
-            <span class="pill">Tap</span>
-            <span class="pill">Swipe</span>
-            <span class="pill">Open</span>
-            <span class="pill">Enjoy</span>
-          </div>
-        </div>
-      </div>
+    <div class="home-actions">
+      <a class="btnx btnx-primary" href="#rail" data-pjax>Explore</a>
+      <a class="btnx btnx-ghost" href="#list" data-pjax>Latest</a>
     </div>
-  </section>
+  </div>
 
-  <!-- Poster Rail -->
-  <section class="rail mt-2" id="rail" data-aos="zoom-in">
+  <section class="rail" id="rail" data-aos="fade-up">
     <div class="section-head">
       <h2 class="h2">Poster Rail</h2>
       <span class="pill">Swipe / Drag</span>
     </div>
 
-    <!-- rail wrapper for subtle mask edges (no gradient, just alpha) -->
-    <div style="position:relative">
-      <div class="poster-rail" id="posterRail" aria-label="Poster rail">
-        <% (posts || []).slice(0,18).forEach((p, idx) => { %>
-          <a class="poster-card floaty"
-             href="/p/<%= p.slug %>"
-             data-pjax
-             data-aos="fade-up"
-             data-aos-delay="<%= Math.min(240, idx*25) %>">
+    <div class="poster-rail" id="posterRail" aria-label="Poster rail">
+      <% (posts || []).slice(0,20).forEach((p, idx) => { %>
+        <a class="poster-card"
+           href="/p/<%= p.slug %>" data-pjax
+           data-aos="fade-up"
+           data-aos-delay="<%= Math.min(240, idx*20) %>">
 
-            <% if (p.poster_url) { %>
-              <img loading="lazy" referrerpolicy="no-referrer" src="<%= p.poster_url %>" alt="<%= p.title %> poster"/>
-            <% } else { %>
-              <div class="muted p-3" style="height:255px;display:flex;align-items:center;justify-content:center">
-                No image
-              </div>
-            <% } %>
+          <% if (p.poster_url) { %>
+            <img loading="lazy" referrerpolicy="no-referrer" src="<%= p.poster_url %>" alt="<%= p.title %> poster"/>
+          <% } else { %>
+            <div class="poster-fallback">No poster</div>
+          <% } %>
 
-            <div class="poster-cap">
-              <div class="t"><%= p.title %></div>
-              <div class="m">
-                <%= p.release_year || "" %>
-                <% if (p.vote_average) { %> • ⭐ <%= (p.vote_average||"").toString().slice(0,3) %><% } %>
-              </div>
+          <div class="poster-cap">
+            <div class="t"><%= p.title %></div>
+            <div class="m">
+              <%= p.release_year || "" %>
+              <% if (p.vote_average) { %> • ⭐ <%= (p.vote_average||"").toString().slice(0,3) %><% } %>
             </div>
-          </a>
-        <% }) %>
-      </div>
-
-      <!-- subtle edge masks (no gradient: we use solid overlay with low alpha) -->
-      <div aria-hidden="true" style="position:absolute;left:0;top:0;bottom:0;width:26px;background:rgba(7,11,10,.55)"></div>
-      <div aria-hidden="true" style="position:absolute;right:0;top:0;bottom:0;width:26px;background:rgba(7,11,10,.55)"></div>
-
-      <!-- hint -->
-      <div class="muted small mt-2" data-aos="fade-up" data-aos-delay="120">
-        Drag horizontally • Click a poster to open details
-      </div>
+          </div>
+        </a>
+      <% }) %>
     </div>
+
+    <div class="muted small rail-hint">Drag horizontally • Click a poster to open details</div>
   </section>
 
-  <!-- Latest -->
   <div class="section-head mt-3" id="list" data-aos="fade-right">
     <h2 class="h2">Latest Movies</h2>
     <span class="pill">Tap to open</span>
@@ -153,37 +55,26 @@
 
   <section class="grid" data-aos="fade-up">
     <% (posts || []).forEach((p, i) => { %>
-      <a class="cardx tilt"
-         href="/p/<%= p.slug %>"
-         data-pjax
-         data-tilt
+      <a class="cardx"
+         href="/p/<%= p.slug %>" data-pjax data-tilt
          data-aos="fade-up"
-         data-aos-delay="<%= Math.min(360, i*20) %>">
+         data-aos-delay="<%= Math.min(240, i*14) %>">
 
         <div class="cardx-media">
           <% if (p.poster_url) { %>
             <img loading="lazy" referrerpolicy="no-referrer" src="<%= p.poster_url %>" alt="<%= p.title %> poster"/>
           <% } else { %>
-            <!-- lightweight placeholder -->
-            <div class="muted" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;opacity:.8">
-              Poster unavailable
-            </div>
+            <div class="card-fallback">Poster unavailable</div>
           <% } %>
         </div>
 
         <div class="cardx-body">
           <h3 class="cardx-title"><%= p.title %></h3>
-          <p class="cardx-excerpt"><%= (p.excerpt||"").slice(0, 140) %></p>
+          <p class="cardx-excerpt"><%= (p.excerpt||"").slice(0, 120) %></p>
 
           <div class="cardx-meta">
             <span class="tag"><%= p.release_year || "Movie" %></span>
-            <span>
-              <% if (p.vote_average) { %>
-                ⭐ <%= (p.vote_average||"").toString().slice(0,3) %>
-              <% } else { %>
-                <span class="muted">New</span>
-              <% } %>
-            </span>
+            <span><% if (p.vote_average) { %>⭐ <%= (p.vote_average||"").toString().slice(0,3) %><% } else { %><span class="muted">New</span><% } %></span>
           </div>
         </div>
       </a>
