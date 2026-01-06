@@ -2,6 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 const path = require("path");
 const expressLayouts = require("express-ejs-layouts");
+
 const { setupMiddleware, injectGlobals } = require("./middleware");
 const cfg = require("./config");
 const publicRoutes = require("./routes-public");
@@ -11,12 +12,17 @@ const { sitemapXml, robotsTxt } = require("./seo");
 function createApp() {
   const app = express();
 
+  // view engine
   app.set("view engine", "ejs");
   app.set("views", path.join(__dirname, "..", "views"));
 
+  // layouts MUST be registered BEFORE routes
   app.use(expressLayouts);
   app.set("layout", "layouts/main");
+  app.set("layout extractScripts", true);
+  app.set("layout extractStyles", true);
 
+  // middleware
   app.use(morgan("dev"));
   app.use(express.urlencoded({ extended: true }));
   app.use(express.static(path.join(__dirname, "..", "public")));
@@ -24,12 +30,15 @@ function createApp() {
   setupMiddleware(app);
   app.use(injectGlobals);
 
+  // SEO endpoints
   app.get("/robots.txt", (req, res) => res.type("text/plain").send(robotsTxt()));
   app.get("/sitemap.xml", async (req, res) => res.type("application/xml").send(await sitemapXml()));
 
+  // routes
   app.use("/", publicRoutes);
   app.use(cfg.adminPath, adminRoutes);
 
+  // errors
   app.use((err, req, res, next) => {
     if (err.code === "EBADCSRFTOKEN") return res.status(403).send("CSRF invalid. Refresh and try again.");
     console.error(err);
