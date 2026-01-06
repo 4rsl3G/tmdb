@@ -3,40 +3,50 @@
      data-desc="<%= pageMeta.desc %>"
      data-canonical="<%= pageMeta.canonical %>">
 
-  <section class="hero">
-    <div class="hero-card aos zoom pulse">
-      <h1 class="hero-title"><%= homeTitle %></h1>
-      <p class="hero-sub"><%= homeDesc %></p>
-      <div class="hero-actions">
-        <a class="btn primary" href="#list" data-pjax>Browse</a>
-      </div>
-      <div class="stats">
-        <div class="stat"><div class="k"><%= posts.length %></div><div class="l">featured titles</div></div>
-        <div class="stat"><div class="k">Green</div><div class="l">branded UI</div></div>
-        <div class="stat"><div class="k">Fast</div><div class="l">SEO-ready</div></div>
+  <section class="hero row g-3 align-items-stretch">
+    <div class="col-lg-7">
+      <div class="hero-card h-100" data-aos="zoom-in">
+        <h1 class="hero-title"><%= homeTitle %></h1>
+        <p class="hero-sub"><%= homeDesc %></p>
+
+        <div class="d-flex gap-2 flex-wrap">
+          <a class="btnx btnx-primary" href="#list" data-pjax>Browse</a>
+          <a class="btnx btnx-ghost" href="/sitemap.xml" target="_blank" rel="noopener">Sitemap</a>
+        </div>
+
+        <div class="stats mt-3">
+          <div class="stat"><div class="k"><%= posts.length %></div><div class="l">featured titles</div></div>
+          <div class="stat"><div class="k">Fast</div><div class="l">mobile-first</div></div>
+          <div class="stat"><div class="k">Green</div><div class="l">brand accent</div></div>
+        </div>
       </div>
     </div>
 
-    <div class="hero-card aos right sweep">
-      <h2 class="h2" style="margin-top:0;">Smartlink</h2>
-      <p class="muted">First movie click redirects to your Smartlink (one-time cookie).</p>
-      <div class="pill"><span class="brand-mark small"></span><span>No gradient • Premium motion</span></div>
+    <div class="col-lg-5">
+      <div class="hero-card h-100" data-aos="fade-left">
+        <h2 class="h2 mb-2">Discover</h2>
+        <p class="muted mb-2">Swipe posters, open a title, enjoy smooth motion.</p>
+        <div class="pill"><span class="brand-mark small"></span><span>Ultra responsive • No gradient</span></div>
+        <div class="mt-3">
+          <div class="muted small">Tip: drag the poster rail.</div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <section class="rail aos zoom">
+  <section class="rail mt-2" data-aos="zoom-in">
     <div class="section-head">
       <h2 class="h2">Poster Rail</h2>
-      <span class="pill">Swipe / drag</span>
+      <span class="pill">Swipe / Drag</span>
     </div>
 
     <div class="poster-rail" id="posterRail">
       <% posts.slice(0,18).forEach(p => { %>
-        <a class="poster-card sweep floaty" href="/p/<%= p.slug %>" data-pjax>
+        <a class="poster-card floaty" href="/p/<%= p.slug %>" data-pjax data-aos="fade-up">
           <% if (p.poster_url) { %>
             <img loading="lazy" referrerpolicy="no-referrer" src="<%= p.poster_url %>" alt="<%= p.title %> poster"/>
           <% } else { %>
-            <div class="muted" style="padding:20px;">No image</div>
+            <div class="muted p-3">No image</div>
           <% } %>
           <div class="poster-cap">
             <div class="t"><%= p.title %></div>
@@ -47,25 +57,25 @@
     </div>
   </section>
 
-  <div class="section-head aos left" id="list">
+  <div class="section-head mt-3" id="list" data-aos="fade-right">
     <h2 class="h2">Latest Movies</h2>
     <span class="pill">Tap to open</span>
   </div>
 
-  <section class="grid stagger aos">
-    <% posts.forEach(p => { %>
-      <a class="card tilt" data-tilt href="/p/<%= p.slug %>" data-pjax>
-        <div class="card-media">
+  <section class="grid stagger" data-aos="fade-up">
+    <% posts.forEach((p, i) => { %>
+      <a class="cardx tilt" href="/p/<%= p.slug %>" data-pjax data-tilt data-aos="fade-up" data-aos-delay="<%= Math.min(300, i*30) %>">
+        <div class="cardx-media">
           <% if (p.poster_url) { %>
             <img loading="lazy" referrerpolicy="no-referrer" src="<%= p.poster_url %>" alt="<%= p.title %> poster"/>
           <% } else { %>
             <div class="muted">No image</div>
           <% } %>
         </div>
-        <div class="card-body">
-          <h3 class="card-title"><%= p.title %></h3>
-          <p class="card-excerpt"><%= (p.excerpt||"").slice(0, 140) %></p>
-          <div class="card-meta">
+        <div class="cardx-body">
+          <h3 class="cardx-title"><%= p.title %></h3>
+          <p class="cardx-excerpt"><%= (p.excerpt||"").slice(0, 140) %></p>
+          <div class="cardx-meta">
             <span class="tag"><%= p.release_year || "Movie" %></span>
             <span>⭐ <%= (p.vote_average||"").toString().slice(0,3) %></span>
           </div>
