@@ -1,7 +1,7 @@
 const cron = require("node-cron");
 const { Post } = require("./models");
+const { getAllSettings } = require("./settings-cache");
 const { listSource, movieFull, posterUrl, backdropUrl, pickTrailerKey, pickDirector, pickCast } = require("./tmdb");
-const cfg = require("./config");
 
 function slugify(s) {
   return (s || "").toLowerCase().trim()
@@ -11,17 +11,36 @@ function slugify(s) {
     .slice(0, 90);
 }
 
-function qualityGate({ overview, voteCount, hasPoster }) {
-  if (!cfg.autoPublish) return false;
-  if (cfg.requirePoster && !hasPoster) return false;
-  if ((overview || "").length < cfg.minOverviewLen) return false;
-  if ((voteCount || 0) < cfg.minVoteCount) return false;
+function toBool(v, d=false) {
+  if (v === undefined || v === null) return d;
+  return String(v).toLowerCase() === "true";
+}
+function toInt(v, d=0) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : d;
+}
+
+function qualityGate(s, d, hasPoster) {
+  const autoPublish = toBool(s.auto_publish, true);
+  if (!autoPublish) return false;
+
+  const requirePoster = toBool(s.require_poster, true);
+  const minOverview = toInt(s.min_overview_len, 120);
+  const minVote = toInt(s.min_vote_count, 50);
+
+  if (requirePoster && !hasPoster) return false;
+  if ((d.overview || "").length < minOverview) return false;
+  if ((d.vote_count || 0) < minVote) return false;
   return true;
 }
 
 async function importOnce() {
-  for (let page = 1; page <= cfg.importPages; page++) {
-    const list = await listSource(cfg.importSource, page);
+  const s = await getAllSettings();
+  const source = s.import_source || "trending_day";
+  const pages = Math.max(1, Math.min(5, toInt(s.import_pages, 1)));
+
+  for (let page=1; page<=pages; page++) {
+    const list = await listSource(source, page);
     const items = list.results || [];
 
     for (const m of items) {
@@ -52,7 +71,7 @@ async function importOnce() {
         ${trailerKey ? `<p><a href="https://www.youtube.com/watch?v=${trailerKey}" target="_blank" rel="nofollow noopener">Watch Trailer</a></p>` : ""}
       `;
 
-      const publish = qualityGate({ overview: d.overview, voteCount: d.vote_count, hasPoster: !!pUrl });
+      const publish = qualityGate(s, d, !!pUrl);
       const status = publish ? "published" : "draft";
 
       await Post.upsert({
@@ -85,14 +104,36 @@ async function importOnce() {
     }
   }
 
-  console.log(`[cron] import done: ${cfg.importSource}, pages=${cfg.importPages}`);
+  console.log(`[cron] imported: ${source} pages=${pages}`);
 }
 
 function startCron() {
-  importOnce().catch(e => console.error("[cron] first run error:", e.message));
-  cron.schedule(cfg.autoImportCron, () => {
-    importOnce().catch(e => console.error("[cron] error:", e.message));
+  // run once
+  importOnce().catch(e => console.error("[cron] first run:", e.message));
+
+  // schedule from settings
+  cron.schedule("*/1 * * * *", async () => {
+    // every minute: check cron setting, but run import only when matches
+    // (simple approach: we keep a real scheduler below)
   });
+
+  // Real scheduler: read cron string periodically and reschedule
+  let task = null;
+  async function reschedule() {
+    const s = await getAllSettings();
+    const expr = s.auto_import_cron || "*/30 * * * *";
+    if (task) task.stop();
+
+    task = cron.schedule(expr, () => {
+      importOnce().catch(e => console.error("[cron] error:", e.message));
+    });
+
+    console.log("[cron] scheduled:", expr);
+  }
+  reschedule().catch(console.error);
+
+  // re-check schedule every 60s (in case admin changed settings)
+  setInterval(() => reschedule().catch(()=>{}), 60_000);
 }
 
 module.exports = { startCron };
