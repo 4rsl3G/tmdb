@@ -1,55 +1,77 @@
 <div id="pjax-page"
-     data-title="<%= pageMeta.title %>"
-     data-desc="<%= pageMeta.desc %>"
-     data-canonical="<%= pageMeta.canonical %>">
+     data-title="<%= pageMeta?.title %>"
+     data-desc="<%= pageMeta?.desc %>"
+     data-canonical="<%= pageMeta?.canonical %>">
 
-  <div class="home-head" data-aos="fade-down">
-    <div class="home-title">
-      <h1 class="home-h1"><%= homeTitle %></h1>
-      <p class="home-sub"><%= homeDesc %></p>
-    </div>
+  <section class="homeHero" data-aos="fade-down">
+    <div class="heroPanel shine sweep floaty">
+      <div class="heroTop">
+        <div class="heroBrand">
+          <span class="brandDot pulse"></span>
+          <div>
+            <h1 class="heroH1"><%= homeTitle %></h1>
+            <p class="heroP"><%= homeDesc %></p>
+          </div>
+        </div>
 
-    <div class="home-actions">
-      <a class="btnx btnx-primary" href="#rail" data-pjax>Explore</a>
-      <a class="btnx btnx-ghost" href="#latest" data-pjax>Latest</a>
+        <div class="heroActions">
+          <a class="btnx btnx-primary" href="#rail" data-pjax>Explore</a>
+          <a class="btnx btnx-ghost" href="#latest" data-pjax>Latest</a>
+          <a class="btnx btnx-ghost" href="/sitemap.xml" target="_blank" rel="noopener">Sitemap</a>
+        </div>
+      </div>
+
+      <div class="heroBadges" data-aos="fade-up" data-aos-delay="120">
+        <span class="pill pill-hot"><span class="miniDot"></span>Ultra Motion</span>
+        <span class="pill"><span class="miniDot"></span>Mobile First</span>
+        <span class="pill"><span class="miniDot"></span>No Gradient</span>
+        <span class="pill"><span class="miniDot"></span>Fast UI</span>
+      </div>
     </div>
-  </div>
+  </section>
 
   <!-- Poster Rail -->
   <section class="rail" id="rail" data-aos="fade-up">
     <div class="section-head">
-      <h2 class="h2">Poster Rail</h2>
+      <h2 class="h2">Poster Rail <span class="rail-arrow">→</span></h2>
       <span class="pill">Swipe / Drag</span>
     </div>
 
-    <div class="poster-rail" id="posterRail" aria-label="Poster rail">
-      <% (posts || []).slice(0,18).forEach((p, idx) => { %>
-        <a class="poster-card"
-           href="/p/<%= p.slug %>" data-pjax
-           data-aos="fade-up"
-           data-aos-delay="<%= Math.min(220, idx*18) %>">
+    <div class="railWrap">
+      <div class="poster-rail" id="posterRail" aria-label="Poster rail">
+        <% (posts || []).slice(0,18).forEach((p, idx) => { %>
+          <a class="poster-card shine"
+             href="/p/<%= p.slug %>" data-pjax
+             data-aos="fade-up"
+             data-aos-delay="<%= Math.min(240, idx*18) %>">
 
-          <% if (p.poster_url) { %>
-            <img loading="lazy" referrerpolicy="no-referrer" src="<%= p.poster_url %>" alt="<%= p.title %> poster"/>
-          <% } else { %>
-            <div class="poster-fallback">No poster</div>
-          <% } %>
-
-          <div class="poster-cap">
-            <div class="t"><%= p.title %></div>
-            <div class="m">
-              <%= p.release_year || "" %>
-              <% if (p.vote_average) { %> • ⭐ <%= (p.vote_average||"").toString().slice(0,3) %><% } %>
+            <div class="posterFrame">
+              <% if (p.poster_url) { %>
+                <img loading="lazy" referrerpolicy="no-referrer" src="<%= p.poster_url %>" alt="<%= p.title %> poster"/>
+              <% } else { %>
+                <div class="poster-fallback">No poster</div>
+              <% } %>
             </div>
-          </div>
-        </a>
-      <% }) %>
+
+            <div class="poster-cap">
+              <div class="t clamp2"><%= p.title %></div>
+              <div class="m">
+                <%= p.release_year || "" %>
+                <% if (p.vote_average) { %> • ⭐ <%= (p.vote_average||"").toString().slice(0,3) %><% } %>
+              </div>
+            </div>
+          </a>
+        <% }) %>
+      </div>
+
+      <div class="railMask railMaskL" aria-hidden="true"></div>
+      <div class="railMask railMaskR" aria-hidden="true"></div>
     </div>
 
     <div class="muted small rail-hint">Drag horizontally • Click a poster to open details</div>
   </section>
 
-  <!-- Latest as poster grid (same style as poster rail) -->
+  <!-- Latest Movies: sama seperti poster rail tapi jadi grid -->
   <div class="section-head mt-3" id="latest" data-aos="fade-right">
     <h2 class="h2">Latest Movies</h2>
     <span class="pill">Tap to open</span>
@@ -57,22 +79,24 @@
 
   <section class="poster-grid" data-aos="fade-up">
     <% (posts || []).forEach((p, i) => { %>
-      <a class="poster-card poster-card--grid"
-         href="/p/<%= p.slug %>" data-pjax
+      <a class="poster-card poster-card--grid shine tilt"
+         href="/p/<%= p.slug %>" data-pjax data-tilt
          data-aos="fade-up"
          data-aos-delay="<%= Math.min(220, i*10) %>">
 
-        <% if (p.poster_url) { %>
-          <img loading="lazy" referrerpolicy="no-referrer" src="<%= p.poster_url %>" alt="<%= p.title %> poster"/>
-        <% } else { %>
-          <div class="poster-fallback">No poster</div>
-        <% } %>
+        <div class="posterFrame">
+          <% if (p.poster_url) { %>
+            <img loading="lazy" referrerpolicy="no-referrer" src="<%= p.poster_url %>" alt="<%= p.title %> poster"/>
+          <% } else { %>
+            <div class="poster-fallback">No poster</div>
+          <% } %>
+        </div>
 
         <div class="poster-cap">
-          <div class="t"><%= p.title %></div>
+          <div class="t clamp2"><%= p.title %></div>
           <div class="m">
             <%= p.release_year || "" %>
-            <% if (p.vote_average) { %> • ⭐ <%= (p.vote_average||"").toString().slice(0,3) %><% } %>
+            <% if (p.vote_average) { %> • ⭐ <%= (p.vote_average||"").toString().slice(0,3) %><% } else { %> • <span class="muted">New</span><% } %>
           </div>
         </div>
       </a>
