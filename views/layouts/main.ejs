@@ -84,6 +84,18 @@
   <!-- CDN JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  // init AOS early (layout)
+  (function(){
+    try{
+      if(window.AOS){
+        window.AOS.init({ once:false, mirror:true, duration:650, easing:"ease-out-cubic" });
+        document.documentElement.classList.add("aos-ok");
+      }
+    }catch(e){}
+  })();
+</script>
+<script src="/ui.js"></script>
   <script src="/ui.js"></script>
 </body>
 </html>
