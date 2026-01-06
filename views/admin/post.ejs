@@ -1,0 +1,18 @@
+<div class="section-head aos">
+  <h2 class="h2">Posts (Auto)</h2>
+  <span class="pill">latest 200</span>
+</div>
+
+<section class="grid" style="grid-template-columns:1fr;gap:10px;">
+  <% posts.forEach(p => { %>
+    <div class="hero-card aos zoom">
+      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+        <div>
+          <div style="font-weight:800;"><%= p.title %></div>
+          <div class="muted">/<%= p.slug %> • <%= p.status %></div>
+        </div>
+        <a class="btn ghost" href="/p/<%= p.slug %>" target="_blank" rel="noopener">Open</a>
+      </div>
+    </div>
+  <% }) %>
+</section>
