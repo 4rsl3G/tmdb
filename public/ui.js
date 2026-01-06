@@ -1,7 +1,16 @@
 (() => {
-  const prefersReduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const overlay = document.getElementById("overlay");
 
-  // Mobile menu
+  function showOverlay(){
+    if (!overlay) return;
+    overlay.classList.remove("d-none");
+  }
+  function hideOverlay(){
+    if (!overlay) return;
+    overlay.classList.add("d-none");
+  }
+
+  // menu mobile
   const btn = document.getElementById("menuBtn");
   const menu = document.getElementById("mobileMenu");
   if (btn && menu) {
@@ -13,28 +22,22 @@
   }
 
   function initAOS(){
-    const targets = document.querySelectorAll(".aos, .grid.stagger");
-    if (prefersReduce) {
-      targets.forEach(el => el.classList.add("in"));
-      return;
-    }
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) {
-        if (e.isIntersecting) {
-          e.target.classList.add("in");
-          io.unobserve(e.target);
-        }
-      }
-    }, { threshold: 0.12 });
-    targets.forEach(el => io.observe(el));
+    if (!window.AOS) return;
+    AOS.init({
+      once: false,
+      mirror: true,
+      duration: 650,
+      easing: "ease-out-cubic"
+    });
   }
 
   function initTilt(){
-    if (prefersReduce) return;
-    const tiltEls = document.querySelectorAll("[data-tilt]");
-    tiltEls.forEach((el) => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return;
+    const els = document.querySelectorAll("[data-tilt]");
+    els.forEach(el => {
       let raf = null;
-      function onMove(ev){
+      const onMove = (ev) => {
         const r = el.getBoundingClientRect();
         const x = (ev.clientX - r.left) / r.width - 0.5;
         const y = (ev.clientY - r.top) / r.height - 0.5;
@@ -42,26 +45,25 @@
         raf = requestAnimationFrame(() => {
           el.style.transform = `translateY(-3px) rotateX(${(-y*4).toFixed(2)}deg) rotateY(${(x*5).toFixed(2)}deg)`;
         });
-      }
-      function onLeave(){ el.style.transform = ""; }
-      el.addEventListener("mousemove", onMove, { passive: true });
-      el.addEventListener("mouseleave", onLeave, { passive: true });
+      };
+      const onLeave = () => { el.style.transform = ""; };
+      el.addEventListener("mousemove", onMove, { passive:true });
+      el.addEventListener("mouseleave", onLeave, { passive:true });
     });
   }
 
   function initRailDrag(){
     const rail = document.getElementById("posterRail");
     if (!rail) return;
-    let down = false, startX = 0, startScroll = 0;
+    let down=false, startX=0, startScroll=0;
     rail.addEventListener("mousedown", (e) => {
-      down = true; startX = e.pageX; startScroll = rail.scrollLeft; rail.style.cursor = "grabbing";
+      down=true; startX=e.pageX; startScroll=rail.scrollLeft; rail.style.cursor="grabbing";
     });
-    window.addEventListener("mouseup", () => { down = false; rail.style.cursor = ""; });
+    window.addEventListener("mouseup", () => { down=false; rail.style.cursor=""; });
     rail.addEventListener("mousemove", (e) => {
       if (!down) return;
-      const dx = e.pageX - startX;
-      rail.scrollLeft = startScroll - dx;
-    }, { passive: true });
+      rail.scrollLeft = startScroll - (e.pageX - startX);
+    }, { passive:true });
   }
 
   function updateHeadFromPjax(){
@@ -90,7 +92,6 @@
     }
     linkCanon.setAttribute("href", canonical);
 
-    // OG update (optional minimal)
     const ogTitle = document.querySelector('meta[property="og:title"]');
     if (ogTitle) ogTitle.setAttribute("content", title);
     const ogDesc = document.querySelector('meta[property="og:description"]');
@@ -100,8 +101,6 @@
   }
 
   function reinit(){
-    // clear old .in to replay reveals
-    document.querySelectorAll(".aos, .grid.stagger").forEach(el => el.classList.remove("in"));
     initAOS();
     initTilt();
     initRailDrag();
@@ -110,10 +109,11 @@
   // initial
   reinit();
 
-  // === PJAX with jQuery ===
+  // PJAX
   const root = document.getElementById("pjax-root");
   if (root && window.jQuery) {
     function load(url, push=true){
+      showOverlay();
       $.ajax({
         url,
         headers: { "X-Requested-With": "XMLHttpRequest" }
@@ -122,9 +122,11 @@
         if (push) history.pushState({ url }, "", url);
         updateHeadFromPjax();
         reinit();
-        window.scrollTo({ top: 0, behavior: prefersReduce ? "auto" : "smooth" });
+        window.scrollTo({ top:0, behavior:"smooth" });
       }).fail(() => {
         window.location.href = url;
+      }).always(() => {
+        setTimeout(hideOverlay, 120);
       });
     }
 
