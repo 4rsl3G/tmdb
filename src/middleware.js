@@ -3,26 +3,28 @@ const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const csurf = require("csurf");
 const sanitizeHtml = require("sanitize-html");
-const { Setting } = require("./models");
-const cfg = require("./config");
+const { getAllSettings } = require("./settings-cache");
 const { abs } = require("./seo");
+const cfg = require("./config");
 
 function isAjax(req) {
   return req.get("X-Requested-With") === "XMLHttpRequest";
 }
 
 async function injectGlobals(req, res, next) {
-  const get = async (key, fallback="") => (await Setting.findByPk(key))?.value ?? fallback;
+  const s = await getAllSettings();
 
-  res.locals.siteName = await get("site_name", "GreenPulse Movies");
-  res.locals.homeTitle = await get("home_title", "Trending Movies (EN)");
-  res.locals.homeDesc = await get("home_desc", "Fresh movie pages with posters, cast, trailers.");
+  res.locals.siteName = s.site_name || "GreenPulse Movies";
+  res.locals.homeTitle = s.home_title || "Trending Movies (EN)";
+  res.locals.homeDesc = s.home_desc || "Posters, cast, trailers — fast and responsive.";
+  res.locals.accentHex = s.accent_hex || "#39ff9b";
 
   res.locals.adminPath = cfg.adminPath;
   res.locals.canonical = abs(req.path);
+  res.locals.isAjax = isAjax(req);
 
   res.locals.sanitize = (html) => sanitizeHtml(html || "", {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "h1","h2","h3","hr"]),
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img","h1","h2","h3","hr"]),
     allowedAttributes: {
       a: ["href","name","target","rel"],
       img: ["src","alt","title","width","height","loading","referrerpolicy"]
@@ -30,7 +32,6 @@ async function injectGlobals(req, res, next) {
     allowedSchemes: ["http","https","data"]
   });
 
-  res.locals.isAjax = isAjax(req);
   next();
 }
 
