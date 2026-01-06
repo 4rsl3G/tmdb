@@ -11,10 +11,11 @@
 
     <div class="home-actions">
       <a class="btnx btnx-primary" href="#rail" data-pjax>Explore</a>
-      <a class="btnx btnx-ghost" href="#list" data-pjax>Latest</a>
+      <a class="btnx btnx-ghost" href="#latest" data-pjax>Latest</a>
     </div>
   </div>
 
+  <!-- Poster Rail -->
   <section class="rail" id="rail" data-aos="fade-up">
     <div class="section-head">
       <h2 class="h2">Poster Rail</h2>
@@ -22,11 +23,11 @@
     </div>
 
     <div class="poster-rail" id="posterRail" aria-label="Poster rail">
-      <% (posts || []).slice(0,20).forEach((p, idx) => { %>
+      <% (posts || []).slice(0,18).forEach((p, idx) => { %>
         <a class="poster-card"
            href="/p/<%= p.slug %>" data-pjax
            data-aos="fade-up"
-           data-aos-delay="<%= Math.min(240, idx*20) %>">
+           data-aos-delay="<%= Math.min(220, idx*18) %>">
 
           <% if (p.poster_url) { %>
             <img loading="lazy" referrerpolicy="no-referrer" src="<%= p.poster_url %>" alt="<%= p.title %> poster"/>
@@ -48,36 +49,34 @@
     <div class="muted small rail-hint">Drag horizontally • Click a poster to open details</div>
   </section>
 
-  <div class="section-head mt-3" id="list" data-aos="fade-right">
+  <!-- Latest as poster grid (same style as poster rail) -->
+  <div class="section-head mt-3" id="latest" data-aos="fade-right">
     <h2 class="h2">Latest Movies</h2>
     <span class="pill">Tap to open</span>
   </div>
 
-  <section class="grid" data-aos="fade-up">
+  <section class="poster-grid" data-aos="fade-up">
     <% (posts || []).forEach((p, i) => { %>
-      <a class="cardx"
-         href="/p/<%= p.slug %>" data-pjax data-tilt
+      <a class="poster-card poster-card--grid"
+         href="/p/<%= p.slug %>" data-pjax
          data-aos="fade-up"
-         data-aos-delay="<%= Math.min(240, i*14) %>">
+         data-aos-delay="<%= Math.min(220, i*10) %>">
 
-        <div class="cardx-media">
-          <% if (p.poster_url) { %>
-            <img loading="lazy" referrerpolicy="no-referrer" src="<%= p.poster_url %>" alt="<%= p.title %> poster"/>
-          <% } else { %>
-            <div class="card-fallback">Poster unavailable</div>
-          <% } %>
-        </div>
+        <% if (p.poster_url) { %>
+          <img loading="lazy" referrerpolicy="no-referrer" src="<%= p.poster_url %>" alt="<%= p.title %> poster"/>
+        <% } else { %>
+          <div class="poster-fallback">No poster</div>
+        <% } %>
 
-        <div class="cardx-body">
-          <h3 class="cardx-title"><%= p.title %></h3>
-          <p class="cardx-excerpt"><%= (p.excerpt||"").slice(0, 120) %></p>
-
-          <div class="cardx-meta">
-            <span class="tag"><%= p.release_year || "Movie" %></span>
-            <span><% if (p.vote_average) { %>⭐ <%= (p.vote_average||"").toString().slice(0,3) %><% } else { %><span class="muted">New</span><% } %></span>
+        <div class="poster-cap">
+          <div class="t"><%= p.title %></div>
+          <div class="m">
+            <%= p.release_year || "" %>
+            <% if (p.vote_average) { %> • ⭐ <%= (p.vote_average||"").toString().slice(0,3) %><% } %>
           </div>
         </div>
       </a>
     <% }) %>
   </section>
+
 </div>
