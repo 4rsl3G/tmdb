@@ -444,3 +444,63 @@ html:not(.aos-ok) [data-aos]{
 @media (prefers-reduced-motion: reduce){
   *{ animation:none!important; transition:none!important; }
 }
+
+/* === P A N S A Overlay branding === */
+.pansa-overlay{
+  position:fixed;
+  top:82px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:30;
+  width:100%;
+  max-width:420px;
+  padding:0 14px;
+  pointer-events:none;
+}
+
+.pansa-card{
+  background:var(--panel2);
+  border:1px solid var(--stroke2);
+  border-radius:18px;
+  padding:14px 18px;
+  box-shadow:var(--shadow2);
+  animation:floaty 4.8s infinite ease-in-out;
+}
+
+.pansa-inner{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.pansa-text{
+  display:flex;
+  flex-direction:column;
+  line-height:1.2;
+}
+
+.pansa-title{
+  font-size:17px;
+  font-weight:900;
+  letter-spacing:4px;
+  color:var(--brand);
+}
+
+.pansa-sub{
+  font-size:11.5px;
+  font-weight:700;
+  opacity:.8;
+  color:var(--muted);
+}
+
+/* Arrow bounce */
+@keyframes railBounce {
+  0%,100%{transform:translateX(0);opacity:.6}
+  50%{transform:translateX(6px);opacity:1}
+}
+.rail-arrow{
+  display:inline-block;
+  animation:railBounce 1.8s infinite ease-in-out;
+  margin-left:6px;
+  color:var(--brand);
+}
