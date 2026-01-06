@@ -1,18 +1,22 @@
 const axios = require("axios");
+const { getAllSettings } = require("./settings-cache");
 
-const TMDB_KEY = process.env.TMDB_API_KEY;
-const TMDB_LANG = process.env.TMDB_LANG || "en-US";
-const TMDB_REGION = process.env.TMDB_REGION || "US";
-
-function assertKey() {
-  if (!TMDB_KEY) throw new Error("Missing TMDB_API_KEY in .env");
+async function tmdbConfig() {
+  const s = await getAllSettings();
+  return {
+    key: s.tmdb_api_key || process.env.TMDB_API_KEY || "",
+    lang: s.tmdb_lang || process.env.TMDB_LANG || "en-US",
+    region: s.tmdb_region || process.env.TMDB_REGION || "US"
+  };
 }
 
 async function tmdbGet(path, params = {}) {
-  assertKey();
+  const cfg = await tmdbConfig();
+  if (!cfg.key) throw new Error("TMDb API key is empty. Set it in Admin Settings.");
+
   const url = `https://api.themoviedb.org/3${path}`;
   const res = await axios.get(url, {
-    params: { api_key: TMDB_KEY, language: TMDB_LANG, region: TMDB_REGION, ...params },
+    params: { api_key: cfg.key, language: cfg.lang, region: cfg.region, ...params },
     timeout: 15000
   });
   return res.data;
@@ -51,8 +55,4 @@ async function movieFull(id) {
   return { details, providers };
 }
 
-module.exports = {
-  tmdbGet, posterUrl, backdropUrl,
-  pickTrailerKey, pickDirector, pickCast,
-  listSource, movieFull
-};
+module.exports = { tmdbGet, posterUrl, backdropUrl, pickTrailerKey, pickDirector, pickCast, listSource, movieFull };
