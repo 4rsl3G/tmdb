@@ -3,9 +3,12 @@
   const root = document.getElementById("pjax-root");
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const isAdminPage =
-    location.pathname.includes("/admin") ||
-    document.body.classList.contains("is-admin");
+  // ✅ Admin detection MUST rely on body class (works with hidden adminPath)
+  const isAdminPage = document.body.classList.contains("is-admin");
+
+  // Optional: detect admin prefix from body data attr (if you add it)
+  // <body class="is-admin" data-admin-base="/hiddenpath">
+  const adminBase = document.body.getAttribute("data-admin-base") || "/admin";
 
   // ===== Overlay (optional) =====
   function showOverlay(){
@@ -17,7 +20,7 @@
     overlay.classList.add("d-none");
   }
 
-  // ===== Mobile menu (works for both) =====
+  // ===== PUBLIC mobile menu =====
   const btn = document.getElementById("menuBtn");
   const menu = document.getElementById("mobileMenu");
   if (btn && menu) {
@@ -28,8 +31,38 @@
     });
   }
 
-  // ===== AOS Safe Init =====
+  // ===== ADMIN sidebar drawer (works with new admin layout) =====
+  (function initAdminDrawer(){
+    if (!isAdminPage) return;
+
+    const burger = document.getElementById("admBurger");
+    const backdrop = document.getElementById("admBackdrop");
+
+    function openSide(){
+      document.body.classList.add("adm-side-open");
+      if (backdrop) backdrop.hidden = false;
+      if (burger) burger.setAttribute("aria-expanded","true");
+    }
+    function closeSide(){
+      document.body.classList.remove("adm-side-open");
+      if (backdrop) backdrop.hidden = true;
+      if (burger) burger.setAttribute("aria-expanded","false");
+    }
+
+    if (burger) burger.addEventListener("click", () => {
+      document.body.classList.contains("adm-side-open") ? closeSide() : openSide();
+    });
+
+    if (backdrop) backdrop.addEventListener("click", closeSide);
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeSide();
+    });
+  })();
+
+  // ===== AOS Safe Init (public only) =====
   function safeInitAOS(){
+    if (isAdminPage) return;
     try {
       if (window.AOS && typeof window.AOS.init === "function") {
         window.AOS.init({
@@ -39,21 +72,23 @@
           easing: "ease-out-cubic"
         });
 
-        // mark success to disable failsafe CSS
         document.documentElement.classList.add("aos-ok");
 
-        // refresh for PJAX
         setTimeout(() => {
           try { window.AOS.refreshHard(); } catch(e) {}
         }, 50);
+      } else {
+        // keep failsafe if AOS not loaded
+        document.documentElement.classList.remove("aos-ok");
       }
-    } catch (e) {}
+    } catch (e) {
+      document.documentElement.classList.remove("aos-ok");
+    }
   }
 
-  // ===== Micro Parallax for background noise (very light) =====
+  // ===== Micro Parallax =====
   function initBgParallax(){
     if (isAdminPage || reduceMotion) return;
-
     const noise = document.querySelector(".bg-noise");
     if (!noise) return;
 
@@ -78,14 +113,12 @@
     window.addEventListener("mousemove", onMove, { passive:true });
   }
 
-  // ===== Card Spotlight (CSS var driven) =====
+  // ===== Spotlight =====
   function initSpotlight(){
     if (isAdminPage || reduceMotion) return;
-
     const targets = document.querySelectorAll(".poster-card, .cardx, .heroPanel, .postHero");
     targets.forEach(el => {
       let raf = null;
-
       const move = (ev) => {
         const r = el.getBoundingClientRect();
         const x = ((ev.clientX - r.left) / r.width) * 100;
@@ -97,7 +130,6 @@
           el.style.setProperty("--my", y.toFixed(2) + "%");
         });
       };
-
       el.addEventListener("mousemove", move, { passive:true });
       el.addEventListener("mouseleave", () => {
         el.style.removeProperty("--mx");
@@ -106,53 +138,41 @@
     });
   }
 
-  // ===== Ripple effect (click) =====
+  // ===== Ripple =====
   function initRipple(){
     if (isAdminPage || reduceMotion) return;
-
     const selector = ".btnx, .poster-card, .cardx";
     document.addEventListener("click", (e) => {
       const el = e.target.closest(selector);
       if (!el) return;
-
       const r = el.getBoundingClientRect();
       const x = e.clientX - r.left;
       const y = e.clientY - r.top;
-
       const ripple = document.createElement("span");
       ripple.className = "ripple";
       ripple.style.left = x + "px";
       ripple.style.top = y + "px";
-
       el.appendChild(ripple);
       setTimeout(() => ripple.remove(), 650);
     }, { passive:true });
   }
 
-  // ===== Tilt (improved & smoother) =====
+  // ===== Tilt =====
   function initTilt(){
     if (isAdminPage || reduceMotion) return;
-
-    const els = document.querySelectorAll("[data-tilt]");
-    els.forEach(el => {
+    document.querySelectorAll("[data-tilt]").forEach(el => {
       let raf = null;
-
       const onMove = (ev) => {
         const r = el.getBoundingClientRect();
         const x = (ev.clientX - r.left) / r.width - 0.5;
         const y = (ev.clientY - r.top) / r.height - 0.5;
-
         if (raf) cancelAnimationFrame(raf);
         raf = requestAnimationFrame(() => {
           el.style.transform =
             `translateY(-3px) rotateX(${(-y*5).toFixed(2)}deg) rotateY(${(x*6).toFixed(2)}deg)`;
         });
       };
-
-      const onLeave = () => {
-        el.style.transform = "";
-      };
-
+      const onLeave = () => { el.style.transform = ""; };
       el.addEventListener("mousemove", onMove, { passive:true });
       el.addEventListener("mouseleave", onLeave, { passive:true });
     });
@@ -161,9 +181,7 @@
   // ===== Magnetic buttons =====
   function initMagneticButtons(){
     if (isAdminPage || reduceMotion) return;
-
-    const buttons = document.querySelectorAll(".btnx");
-    buttons.forEach(b => {
+    document.querySelectorAll(".btnx").forEach(b => {
       let raf = null;
       const strength = 10;
 
@@ -171,7 +189,6 @@
         const r = b.getBoundingClientRect();
         const x = ev.clientX - (r.left + r.width / 2);
         const y = ev.clientY - (r.top + r.height / 2);
-
         const mx = (x / r.width) * strength;
         const my = (y / r.height) * strength;
 
@@ -181,19 +198,15 @@
         });
       };
 
-      const leave = () => {
-        b.style.transform = "";
-      };
-
+      const leave = () => { b.style.transform = ""; };
       b.addEventListener("mousemove", move, { passive:true });
       b.addEventListener("mouseleave", leave, { passive:true });
     });
   }
 
-  // ===== Rail Drag + Momentum (inertia) =====
+  // ===== Rail drag =====
   function initRailDrag(){
     if (isAdminPage) return;
-
     const rail = document.getElementById("posterRail");
     if (!rail) return;
 
@@ -213,15 +226,10 @@
       if (reduceMotion) return;
 
       const step = () => {
-        // friction
         v *= 0.92;
         rail.scrollLeft -= v * 16;
-
-        if (Math.abs(v) > 0.02) {
-          inertiaRAF = requestAnimationFrame(step);
-        } else {
-          stopInertia();
-        }
+        if (Math.abs(v) > 0.02) inertiaRAF = requestAnimationFrame(step);
+        else stopInertia();
       };
       inertiaRAF = requestAnimationFrame(step);
     };
@@ -256,18 +264,15 @@
 
       const now = performance.now();
       const dt = Math.max(1, now - lastT);
-      const vx = (e.pageX - lastX) / dt; // px/ms
-      v = vx; // keep latest
+      v = (e.pageX - lastX) / dt;
       lastX = e.pageX;
       lastT = now;
     }, { passive:false });
 
-    // Touch support
     rail.addEventListener("touchstart", (e) => {
       if (!e.touches || !e.touches[0]) return;
       down = true;
       const x = e.touches[0].pageX;
-
       startX = x;
       startScroll = rail.scrollLeft;
       lastX = x;
@@ -284,8 +289,7 @@
 
       const now = performance.now();
       const dt = Math.max(1, now - lastT);
-      const vx = (x - lastX) / dt;
-      v = vx;
+      v = (x - lastX) / dt;
       lastX = x;
       lastT = now;
     }, { passive:true });
@@ -297,7 +301,7 @@
     }, { passive:true });
   }
 
-  // ===== Update Head from PJAX =====
+  // ===== Update head for PJAX =====
   function updateHeadFromPjax(){
     const page = document.getElementById("pjax-page");
     if (!page) return;
@@ -325,7 +329,7 @@
     linkCanon.setAttribute("href", canonical);
   }
 
-  // ===== Re-init all effects =====
+  // ===== re-init =====
   function reinit(){
     safeInitAOS();
     initBgParallax();
@@ -336,62 +340,44 @@
     initRailDrag();
   }
 
-  // Always hide overlay if exists
   window.addEventListener("load", () => hideOverlay());
   window.addEventListener("pageshow", () => hideOverlay());
 
-  // initial
   reinit();
 
-  // ===== PJAX only on PUBLIC pages =====
+  // ===== PJAX ONLY PUBLIC =====
   if (!root || !window.jQuery || isAdminPage) return;
 
   function load(url, push=true){
     showOverlay();
-
-    $.ajax({
-      url,
-      headers: { "X-Requested-With": "XMLHttpRequest" }
-    })
-    .done((html) => {
-      root.innerHTML = html;
-
-      if (push) history.pushState({ url }, "", url);
-
-      updateHeadFromPjax();
-      reinit();
-
-      // AOS refresh extra safety
-      try { window.AOS && window.AOS.refreshHard(); } catch(e){}
-
-      try { window.scrollTo({ top: 0, behavior: "smooth" }); }
-      catch { window.scrollTo(0,0); }
-    })
-    .fail(() => {
-      window.location.href = url;
-    })
-    .always(() => {
-      setTimeout(hideOverlay, 120);
-    });
+    $.ajax({ url, headers: { "X-Requested-With": "XMLHttpRequest" } })
+      .done((html) => {
+        root.innerHTML = html;
+        if (push) history.pushState({ url }, "", url);
+        updateHeadFromPjax();
+        reinit();
+        try { window.AOS && window.AOS.refreshHard(); } catch(e){}
+        try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch { window.scrollTo(0,0); }
+      })
+      .fail(() => { window.location.href = url; })
+      .always(() => { setTimeout(hideOverlay, 120); });
   }
 
-  // Intercept clicks
   $(document).on("click", "a[data-pjax]", function(e){
     const href = $(this).attr("href");
     if (!href) return;
 
-    // block external & admin links
     if (href.startsWith("http")) return;
-    if (href.includes("/admin")) return;
+
+    // ✅ block any admin base path (hidden too)
+    if (href.startsWith(adminBase)) return;
 
     e.preventDefault();
     load(href, true);
   });
 
-  // Back/forward
   window.addEventListener("popstate", (e) => {
     const url = (e.state && e.state.url) ? e.state.url : window.location.pathname;
     load(url, false);
   });
-
 })();
