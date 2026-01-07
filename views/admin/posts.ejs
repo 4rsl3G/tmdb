@@ -1,18 +1,67 @@
-<div class="section-head" data-aos="fade-up">
-  <h2 class="h2">Posts</h2>
-  <span class="pill">latest 200</span>
-</div>
+<div class="adm-page">
 
-<div class="d-grid gap-2">
-  <% posts.forEach(p => { %>
-    <div class="hero-card" data-aos="fade-up">
-      <div class="d-flex justify-content-between flex-wrap gap-2">
-        <div>
-          <div class="fw-bold"><%= p.title %></div>
-          <div class="muted small">/<%= p.slug %> • <%= p.status %></div>
-        </div>
-        <a class="btn btn-sm btn-outline-light" href="/p/<%= p.slug %>" target="_blank" rel="noopener">Open</a>
+  <div class="adm-card shine">
+    <div class="adm-card-top">
+      <div>
+        <div class="adm-card-k muted">Library</div>
+        <div class="adm-card-v">Posts</div>
+      </div>
+
+      <form class="adm-search" method="GET" action="/admin/posts">
+        <input class="adm-input adm-input-sm" type="text" name="q" value="<%= q || '' %>" placeholder="Search title / slug...">
+        <button class="adm-btn adm-btn-ghost adm-btn-sm" type="submit">Search</button>
+      </form>
+    </div>
+
+    <div class="adm-table-wrap mt-2">
+      <table class="adm-table">
+        <thead>
+          <tr>
+            <th style="width:48%">Title</th>
+            <th>Year</th>
+            <th>Rating</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% (posts || []).forEach(p => { %>
+            <tr>
+              <td>
+                <div class="adm-td-main"><%= p.title %></div>
+                <div class="adm-td-sub muted">/<%= p.slug %></div>
+              </td>
+              <td class="muted"><%= p.release_year || "—" %></td>
+              <td class="muted"><%= p.vote_average ? ("⭐ " + String(p.vote_average).slice(0,3)) : "—" %></td>
+              <td class="text-end">
+                <a class="adm-btn adm-btn-ghost adm-btn-sm" href="/p/<%= p.slug %>" target="_blank" rel="noopener">View</a>
+                <a class="adm-btn adm-btn-ghost adm-btn-sm" href="/admin/posts/<%= p.id %>/edit">Edit</a>
+                <form method="POST" action="/admin/posts/<%= p.id %>/delete" class="d-inline">
+                  <button class="adm-btn adm-btn-danger adm-btn-sm" type="submit"
+                    onclick="return confirm('Delete this post?')">Delete</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+
+          <% if (!posts || posts.length === 0) { %>
+            <tr><td colspan="4" class="muted">No posts found.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="adm-row mt-3">
+      <div class="muted small">Showing <%= (posts||[]).length %> items</div>
+
+      <div class="adm-row">
+        <% if (pagination?.prev) { %>
+          <a class="adm-btn adm-btn-ghost adm-btn-sm" href="/admin/posts?page=<%= pagination.prev %>">Prev</a>
+        <% } %>
+        <% if (pagination?.next) { %>
+          <a class="adm-btn adm-btn-ghost adm-btn-sm" href="/admin/posts?page=<%= pagination.next %>">Next</a>
+        <% } %>
       </div>
     </div>
-  <% }) %>
+  </div>
+
 </div>
