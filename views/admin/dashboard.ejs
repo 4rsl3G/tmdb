@@ -1,10 +1,113 @@
-<div class="section-head" data-aos="fade-up">
-  <h2 class="h2">Dashboard</h2>
-  <span class="pill">Admin Control</span>
-</div>
+<div class="adm-page">
 
-<div class="row g-3" data-aos="fade-up">
-  <div class="col-md-4"><div class="hero-card"><div class="muted">Total</div><div class="big"><%= count %></div></div></div>
-  <div class="col-md-4"><div class="hero-card"><div class="muted">Published</div><div class="big"><%= pub %></div></div></div>
-  <div class="col-md-4"><div class="hero-card"><div class="muted">Draft</div><div class="big"><%= draft %></div></div></div>
+  <div class="adm-grid-2">
+    <div class="adm-card shine">
+      <div class="adm-card-top">
+        <div>
+          <div class="adm-card-k muted">Overview</div>
+          <div class="adm-card-v">Dashboard</div>
+        </div>
+        <span class="adm-pill"><span class="adm-pill-dot"></span>Live</span>
+      </div>
+
+      <div class="adm-metrics">
+        <div class="adm-metric">
+          <div class="adm-metric-k muted">Total Posts</div>
+          <div class="adm-metric-v"><%= stats?.postsCount ?? (postsCount ?? 0) %></div>
+        </div>
+        <div class="adm-metric">
+          <div class="adm-metric-k muted">Last Cron</div>
+          <div class="adm-metric-v"><%= stats?.lastCron || "—" %></div>
+        </div>
+        <div class="adm-metric">
+          <div class="adm-metric-k muted">TMDB</div>
+          <div class="adm-metric-v"><%= stats?.tmdbStatus || "OK" %></div>
+        </div>
+      </div>
+
+      <div class="adm-divider"></div>
+
+      <div class="adm-row">
+        <a class="adm-btn adm-btn-ghost" href="/admin/posts">Manage Posts</a>
+        <a class="adm-btn adm-btn-ghost" href="/admin/settings">Settings</a>
+      </div>
+    </div>
+
+    <div class="adm-card shine">
+      <div class="adm-card-top">
+        <div>
+          <div class="adm-card-k muted">Quick Actions</div>
+          <div class="adm-card-v">Control</div>
+        </div>
+        <span class="adm-chip">TOOLS</span>
+      </div>
+
+      <div class="adm-quick">
+        <a class="adm-quick-item" href="/admin/posts">
+          <div class="adm-quick-ic">▦</div>
+          <div>
+            <div class="adm-quick-t">Posts</div>
+            <div class="adm-quick-d muted">View latest / bulk ops</div>
+          </div>
+        </a>
+
+        <a class="adm-quick-item" href="/admin/settings">
+          <div class="adm-quick-ic">⚙</div>
+          <div>
+            <div class="adm-quick-t">Settings</div>
+            <div class="adm-quick-d muted">Keys, smartlinks, SEO</div>
+          </div>
+        </a>
+
+        <a class="adm-quick-item" href="/admin/public">
+          <div class="adm-quick-ic">⛭</div>
+          <div>
+            <div class="adm-quick-t">Public</div>
+            <div class="adm-quick-d muted">Homepage config</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="adm-card mt-3 shine">
+    <div class="adm-card-top">
+      <div>
+        <div class="adm-card-k muted">System</div>
+        <div class="adm-card-v">Latest Activity</div>
+      </div>
+      <span class="pill pill-hot"><span class="miniDot"></span>Pro</span>
+    </div>
+
+    <div class="adm-table-wrap">
+      <table class="adm-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Status</th>
+            <th class="text-end">Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% (activity || []).slice(0,10).forEach(a => { %>
+            <tr>
+              <td>
+                <div class="adm-td-main"><%= a.title || a.item || "—" %></div>
+                <div class="adm-td-sub muted"><%= a.desc || "" %></div>
+              </td>
+              <td><span class="adm-tag"><%= a.status || "OK" %></span></td>
+              <td class="text-end muted"><%= a.time || "" %></td>
+            </tr>
+          <% }) %>
+
+          <% if (!activity || activity.length === 0) { %>
+            <tr>
+              <td colspan="3" class="muted">No activity yet.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
