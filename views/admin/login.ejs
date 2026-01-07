@@ -1,13 +1,12 @@
 <div class="adm-page">
-
   <div class="adm-login-wrap">
-    <div class="adm-login-card">
+    <div class="adm-login-card shine">
       <div class="adm-login-head">
         <div class="adm-login-brand">
           <span class="adm-dot"></span>
           <div>
             <div class="adm-login-title">Admin Login</div>
-            <div class="adm-login-sub muted">Secure access to control center</div>
+            <div class="adm-login-sub muted">Secure access</div>
           </div>
         </div>
         <span class="adm-chip">AUTH</span>
@@ -17,24 +16,23 @@
         <div class="adm-alert adm-alert-danger"><%= error %></div>
       <% } %>
 
-      <form method="POST" action="/admin/login" class="adm-form">
+      <form method="POST" action="<%= (typeof adminPath !== 'undefined' && adminPath) ? adminPath : '' %>/login" class="adm-form">
         <div class="adm-field">
           <label class="adm-label">Username</label>
-          <input class="adm-input" type="text" name="username" placeholder="Enter username" autocomplete="username" required>
+          <input class="adm-input" type="text" name="username" autocomplete="username" required>
         </div>
 
         <div class="adm-field">
           <label class="adm-label">Password</label>
-          <input class="adm-input" type="password" name="password" placeholder="Enter password" autocomplete="current-password" required>
+          <input class="adm-input" type="password" name="password" autocomplete="current-password" required>
         </div>
 
         <button class="adm-btn adm-btn-primary" type="submit">Sign In</button>
 
         <div class="adm-login-foot muted">
-          Tip: change admin path in <code>.env</code> (hidden route) for extra safety.
+          Default env: <code>ADMIN_USER</code> & <code>ADMIN_PASS</code>
         </div>
       </form>
     </div>
   </div>
-
 </div>
