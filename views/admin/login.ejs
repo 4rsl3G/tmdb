@@ -1,23 +1,40 @@
-<div class="hero-card mx-auto" style="max-width:520px">
-  <h1 class="h2 mb-2">Admin Login</h1>
+<div class="adm-page">
 
-  <% if (error) { %>
-    <div class="alert alert-danger py-2"><%= error %></div>
-  <% } %>
+  <div class="adm-login-wrap">
+    <div class="adm-login-card">
+      <div class="adm-login-head">
+        <div class="adm-login-brand">
+          <span class="adm-dot"></span>
+          <div>
+            <div class="adm-login-title">Admin Login</div>
+            <div class="adm-login-sub muted">Secure access to control center</div>
+          </div>
+        </div>
+        <span class="adm-chip">AUTH</span>
+      </div>
 
-  <form method="post" action="<%= adminPath %>/login" class="d-grid gap-3">
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <% if (error) { %>
+        <div class="adm-alert adm-alert-danger"><%= error %></div>
+      <% } %>
 
-    <div>
-      <label class="form-label muted">Username</label>
-      <input class="form-control form-control-lg" name="username" required>
+      <form method="POST" action="/admin/login" class="adm-form">
+        <div class="adm-field">
+          <label class="adm-label">Username</label>
+          <input class="adm-input" type="text" name="username" placeholder="Enter username" autocomplete="username" required>
+        </div>
+
+        <div class="adm-field">
+          <label class="adm-label">Password</label>
+          <input class="adm-input" type="password" name="password" placeholder="Enter password" autocomplete="current-password" required>
+        </div>
+
+        <button class="adm-btn adm-btn-primary" type="submit">Sign In</button>
+
+        <div class="adm-login-foot muted">
+          Tip: change admin path in <code>.env</code> (hidden route) for extra safety.
+        </div>
+      </form>
     </div>
+  </div>
 
-    <div>
-      <label class="form-label muted">Password</label>
-      <input class="form-control form-control-lg" type="password" name="password" required>
-    </div>
-
-    <button class="btn btn-lg btn-success" type="submit">Login</button>
-  </form>
 </div>
