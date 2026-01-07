@@ -1,117 +1,88 @@
-<div class="section-head" data-aos="fade-up">
-  <h2 class="h2">Settings</h2>
-  <% if (saved) { %><span class="pill">Saved</span><% } %>
+<div class="adm-page">
+
+  <div class="adm-grid-2">
+    <div class="adm-card shine">
+      <div class="adm-card-top">
+        <div>
+          <div class="adm-card-k muted">Core</div>
+          <div class="adm-card-v">Website Settings</div>
+        </div>
+        <span class="adm-chip">CONFIG</span>
+      </div>
+
+      <form method="POST" action="/admin/settings" class="adm-form mt-2">
+        <div class="adm-field">
+          <label class="adm-label">Site Name</label>
+          <input class="adm-input" type="text" name="siteName" value="<%= settings?.siteName || siteName || '' %>">
+        </div>
+
+        <div class="adm-field">
+          <label class="adm-label">Accent Color (Hex)</label>
+          <input class="adm-input" type="text" name="accentHex" value="<%= settings?.accentHex || accentHex || '#39ff9b' %>" placeholder="#39ff9b">
+        </div>
+
+        <div class="adm-field">
+          <label class="adm-label">TMDB API Key</label>
+          <input class="adm-input" type="text" name="tmdbKey" value="<%= settings?.tmdbKey || '' %>" placeholder="TMDB key">
+          <div class="adm-help muted">Used by cron auto-fetch & post generator.</div>
+        </div>
+
+        <button class="adm-btn adm-btn-primary" type="submit">Save Settings</button>
+      </form>
+    </div>
+
+    <div class="adm-card shine">
+      <div class="adm-card-top">
+        <div>
+          <div class="adm-card-k muted">Monetization</div>
+          <div class="adm-card-v">Smartlink</div>
+        </div>
+        <span class="adm-chip">ADS</span>
+      </div>
+
+      <form method="POST" action="/admin/settings/ads" class="adm-form mt-2">
+        <div class="adm-field">
+          <label class="adm-label">Smartlink URL</label>
+          <input class="adm-input" type="text" name="smartlinkUrl" value="<%= settings?.smartlinkUrl || '' %>" placeholder="https://...">
+          <div class="adm-help muted">Used for first click redirect logic (if enabled).</div>
+        </div>
+
+        <div class="adm-field">
+          <label class="adm-label">Enable Smartlink Only</label>
+          <select class="adm-input" name="smartlinkOnly">
+            <option value="1" <%= (settings?.smartlinkOnly ? "selected" : "") %>>Enabled</option>
+            <option value="0" <%= (!settings?.smartlinkOnly ? "selected" : "") %>>Disabled</option>
+          </select>
+        </div>
+
+        <button class="adm-btn adm-btn-primary" type="submit">Save Ads</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="adm-card mt-3 shine">
+    <div class="adm-card-top">
+      <div>
+        <div class="adm-card-k muted">SEO</div>
+        <div class="adm-card-v">Meta Defaults</div>
+      </div>
+      <span class="adm-chip">SEO</span>
+    </div>
+
+    <form method="POST" action="/admin/settings/seo" class="adm-form mt-2">
+      <div class="adm-grid-2">
+        <div class="adm-field">
+          <label class="adm-label">Home Title</label>
+          <input class="adm-input" type="text" name="homeTitle" value="<%= settings?.homeTitle || '' %>">
+        </div>
+        <div class="adm-field">
+          <label class="adm-label">Home Description</label>
+          <input class="adm-input" type="text" name="homeDesc" value="<%= settings?.homeDesc || '' %>">
+        </div>
+      </div>
+
+      <button class="adm-btn adm-btn-primary" type="submit">Save SEO</button>
+    </form>
+  </div>
+
 </div>
-
-<form method="post" action="<%= adminPath %>/settings" class="row g-3" data-aos="fade-up">
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-
-  <div class="col-12">
-    <div class="hero-card">
-      <h3 class="h2 mb-2">Branding</h3>
-      <div class="row g-2">
-        <div class="col-md-4">
-          <label class="form-label muted">Site Name</label>
-          <input class="form-control" name="site_name" value="<%= s.site_name || '' %>">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label muted">Accent Color (HEX)</label>
-          <input class="form-control" name="accent_hex" value="<%= s.accent_hex || '#39ff9b' %>">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label muted">Smartlink URL</label>
-          <input class="form-control" name="smartlink_url" value="<%= s.smartlink_url || '' %>">
-        </div>
-        <div class="col-12">
-          <label class="form-label muted">Home Title</label>
-          <input class="form-control" name="home_title" value="<%= s.home_title || '' %>">
-        </div>
-        <div class="col-12">
-          <label class="form-label muted">Home Description</label>
-          <textarea class="form-control" rows="3" name="home_desc"><%= s.home_desc || '' %></textarea>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-12">
-    <div class="hero-card">
-      <h3 class="h2 mb-2">TMDb</h3>
-      <div class="row g-2">
-        <div class="col-md-6">
-          <label class="form-label muted">TMDb API Key</label>
-          <input class="form-control" name="tmdb_api_key" value="<%= s.tmdb_api_key || '' %>">
-        </div>
-        <div class="col-md-3">
-          <label class="form-label muted">Language</label>
-          <input class="form-control" name="tmdb_lang" value="<%= s.tmdb_lang || 'en-US' %>">
-        </div>
-        <div class="col-md-3">
-          <label class="form-label muted">Region</label>
-          <input class="form-control" name="tmdb_region" value="<%= s.tmdb_region || 'US' %>">
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-12">
-    <div class="hero-card">
-      <h3 class="h2 mb-2">Auto Import</h3>
-      <div class="row g-2">
-        <div class="col-md-4">
-          <label class="form-label muted">Cron</label>
-          <input class="form-control" name="auto_import_cron" value="<%= s.auto_import_cron || '*/30 * * * *' %>">
-        </div>
-        <div class="col-md-4">
-          <label class="form-label muted">Source</label>
-          <select class="form-select" name="import_source">
-            <% const src = s.import_source || 'trending_day'; %>
-            <option value="trending_day" <%= src==='trending_day'?'selected':'' %>>trending_day</option>
-            <option value="trending_week" <%= src==='trending_week'?'selected':'' %>>trending_week</option>
-            <option value="popular" <%= src==='popular'?'selected':'' %>>popular</option>
-            <option value="top_rated" <%= src==='top_rated'?'selected':'' %>>top_rated</option>
-            <option value="now_playing" <%= src==='now_playing'?'selected':'' %>>now_playing</option>
-          </select>
-        </div>
-        <div class="col-md-4">
-          <label class="form-label muted">Pages (1-5)</label>
-          <input class="form-control" name="import_pages" value="<%= s.import_pages || '1' %>">
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-12">
-    <div class="hero-card">
-      <h3 class="h2 mb-2">Auto Publish (Quality Gate)</h3>
-      <div class="row g-2">
-        <div class="col-md-3">
-          <label class="form-label muted">Auto publish</label>
-          <select class="form-select" name="auto_publish">
-            <option value="true" <%= (s.auto_publish||'true')==='true'?'selected':'' %>>true</option>
-            <option value="false" <%= (s.auto_publish||'true')==='false'?'selected':'' %>>false</option>
-          </select>
-        </div>
-        <div class="col-md-3">
-          <label class="form-label muted">Min overview len</label>
-          <input class="form-control" name="min_overview_len" value="<%= s.min_overview_len || '120' %>">
-        </div>
-        <div class="col-md-3">
-          <label class="form-label muted">Min vote count</label>
-          <input class="form-control" name="min_vote_count" value="<%= s.min_vote_count || '50' %>">
-        </div>
-        <div class="col-md-3">
-          <label class="form-label muted">Require poster</label>
-          <select class="form-select" name="require_poster">
-            <option value="true" <%= (s.require_poster||'true')==='true'?'selected':'' %>>true</option>
-            <option value="false" <%= (s.require_poster||'true')==='false'?'selected':'' %>>false</option>
-          </select>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="col-12">
-    <button class="btn btn-success btn-lg w-100" type="submit">Save All</button>
-  </div>
-</form>
