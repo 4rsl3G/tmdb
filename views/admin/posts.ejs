@@ -7,19 +7,18 @@
         <div class="adm-card-v">Posts</div>
       </div>
 
-      <form class="adm-search" method="GET" action="/admin/posts">
-        <input class="adm-input adm-input-sm" type="text" name="q" value="<%= q || '' %>" placeholder="Search title / slug...">
-        <button class="adm-btn adm-btn-ghost adm-btn-sm" type="submit">Search</button>
-      </form>
+      <div class="adm-row" style="justify-content:flex-end;">
+        <span class="adm-tag"><%= (posts || []).length %> items</span>
+      </div>
     </div>
 
     <div class="adm-table-wrap mt-2">
       <table class="adm-table">
         <thead>
           <tr>
-            <th style="width:48%">Title</th>
-            <th>Year</th>
-            <th>Rating</th>
+            <th style="width:50%">Title</th>
+            <th>Status</th>
+            <th>Updated</th>
             <th class="text-end">Actions</th>
           </tr>
         </thead>
@@ -27,18 +26,17 @@
           <% (posts || []).forEach(p => { %>
             <tr>
               <td>
-                <div class="adm-td-main"><%= p.title %></div>
+                <div class="adm-td-main"><%= p.title || "Untitled" %></div>
                 <div class="adm-td-sub muted">/<%= p.slug %></div>
               </td>
-              <td class="muted"><%= p.release_year || "—" %></td>
-              <td class="muted"><%= p.vote_average ? ("⭐ " + String(p.vote_average).slice(0,3)) : "—" %></td>
+              <td>
+                <span class="adm-tag"><%= p.status || "published" %></span>
+              </td>
+              <td class="muted">
+                <%= (p.updatedAt ? new Date(p.updatedAt).toISOString().slice(0,10) : "—") %>
+              </td>
               <td class="text-end">
                 <a class="adm-btn adm-btn-ghost adm-btn-sm" href="/p/<%= p.slug %>" target="_blank" rel="noopener">View</a>
-                <a class="adm-btn adm-btn-ghost adm-btn-sm" href="/admin/posts/<%= p.id %>/edit">Edit</a>
-                <form method="POST" action="/admin/posts/<%= p.id %>/delete" class="d-inline">
-                  <button class="adm-btn adm-btn-danger adm-btn-sm" type="submit"
-                    onclick="return confirm('Delete this post?')">Delete</button>
-                </form>
               </td>
             </tr>
           <% }) %>
@@ -50,18 +48,6 @@
       </table>
     </div>
 
-    <div class="adm-row mt-3">
-      <div class="muted small">Showing <%= (posts||[]).length %> items</div>
-
-      <div class="adm-row">
-        <% if (pagination?.prev) { %>
-          <a class="adm-btn adm-btn-ghost adm-btn-sm" href="/admin/posts?page=<%= pagination.prev %>">Prev</a>
-        <% } %>
-        <% if (pagination?.next) { %>
-          <a class="adm-btn adm-btn-ghost adm-btn-sm" href="/admin/posts?page=<%= pagination.next %>">Next</a>
-        <% } %>
-      </div>
-    </div>
   </div>
 
 </div>
