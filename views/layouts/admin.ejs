@@ -3,49 +3,176 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Admin • <%= siteName %></title>
+
+  <title><%= pageTitle ? (pageTitle + " • Admin • " + siteName) : ("Admin • " + siteName) %></title>
+  <meta name="robots" content="noindex,nofollow"/>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- CDN -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 
-  <link rel="stylesheet" href="/ui.css"/>
-  <style>:root{--brand:<%= accentHex %>;} </style>
+  <link rel="stylesheet" href="/admin.css"/>
+  <style>:root{--brand:<%= accentHex || "#39ff9b" %>;} </style>
 </head>
-<body>
-  <div class="bg"><div class="bg-noise" aria-hidden="true"></div></div>
 
-  <header class="topbar">
-    <div class="container topbar-inner">
-      <a class="brand" href="<%= adminPath %>">
-        <span class="brand-mark pulse"></span>
-        <span class="brand-name">Admin</span>
-      </a>
+<body class="is-admin">
 
-      <nav class="nav d-none d-md-flex">
-        <a class="nav-link" href="<%= adminPath %>">Dashboard</a>
-        <a class="nav-link" href="<%= adminPath %>/posts">Posts</a>
-        <a class="nav-link" href="<%= adminPath %>/settings">Settings</a>
-        <a class="nav-link" href="/" target="_blank" rel="noopener">Public</a>
+  <!-- Premium background -->
+  <div class="adm-bg" aria-hidden="true">
+    <div class="adm-noise" aria-hidden="true"></div>
+    <div class="adm-vignette" aria-hidden="true"></div>
+  </div>
+
+  <!-- Mobile/All: sidebar drawer backdrop -->
+  <div class="adm-backdrop" id="admBackdrop" hidden></div>
+
+  <div class="adm-shell">
+
+    <!-- Sidebar (always exists) -->
+    <aside class="adm-side" id="admSide">
+      <div class="adm-side-top">
+        <a class="adm-brand" href="/admin">
+          <span class="adm-dot"></span>
+          <span class="adm-brand-name"><%= siteName %></span>
+          <span class="adm-chip">ADMIN</span>
+        </a>
+
+        <div class="adm-side-sub muted">
+          Control Center
+        </div>
+      </div>
+
+      <nav class="adm-nav" aria-label="Admin navigation">
+        <a class="adm-item <%= activeNav==='dashboard'?'active':'' %>" href="/admin">
+          <span class="adm-ic">⌁</span><span>Dashboard</span>
+        </a>
+        <a class="adm-item <%= activeNav==='posts'?'active':'' %>" href="/admin/posts">
+          <span class="adm-ic">▦</span><span>Posts</span>
+        </a>
+        <a class="adm-item <%= activeNav==='settings'?'active':'' %>" href="/admin/settings">
+          <span class="adm-ic">⚙</span><span>Settings</span>
+        </a>
+        <a class="adm-item <%= activeNav==='public'?'active':'' %>" href="/admin/public">
+          <span class="adm-ic">⛭</span><span>Public</span>
+        </a>
+
+        <div class="adm-divider"></div>
+
+        <a class="adm-item" href="/" target="_blank" rel="noopener">
+          <span class="adm-ic">↗</span><span>Open Public</span>
+        </a>
+
+        <% if (user) { %>
+          <form method="POST" action="/admin/logout" class="adm-logout">
+            <button class="adm-item adm-item-danger" type="submit">
+              <span class="adm-ic">⟲</span><span>Logout</span>
+            </button>
+          </form>
+        <% } %>
       </nav>
 
-      <form method="post" action="<%= adminPath %>/logout" class="d-none d-md-block">
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-        <button class="btn btn-sm btn-outline-light" type="submit">Logout</button>
-      </form>
-    </div>
-  </header>
+      <div class="adm-side-foot">
+        <div class="adm-foot-card">
+          <div class="adm-foot-k">Status</div>
+          <div class="adm-foot-v">Online</div>
+          <div class="adm-foot-line"></div>
+          <div class="adm-foot-meta muted">Secure Panel • <%= new Date().getFullYear() %></div>
+        </div>
+      </div>
+    </aside>
 
-  <main class="container py-3">
-    <%- body %>
-  </main>
+    <!-- Main area -->
+    <div class="adm-main">
+
+      <!-- Topbar -->
+      <header class="adm-top">
+        <div class="adm-top-inner container-fluid">
+          <button class="adm-burger" id="admBurger" type="button" aria-label="Open sidebar" aria-expanded="false">
+            <span class="adm-lines"></span>
+          </button>
+
+          <div class="adm-title">
+            <div class="adm-title-k"><%= pageTitle || "Admin" %></div>
+            <div class="adm-title-v muted">Premium control with ultra motion</div>
+          </div>
+
+          <div class="adm-actions">
+            <div class="adm-pill">
+              <span class="adm-pill-dot"></span>
+              <span>Live</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <main class="adm-content container-fluid" id="admin-root" role="main">
+        <% if (flash?.error) { %>
+          <div class="adm-alert adm-alert-danger"><%= flash.error %></div>
+        <% } %>
+        <% if (flash?.success) { %>
+          <div class="adm-alert adm-alert-success"><%= flash.success %></div>
+        <% } %>
+
+        <div class="adm-surface">
+          <%- body %>
+        </div>
+      </main>
+
+      <footer class="adm-footer container-fluid">
+        <div class="adm-footer-inner">
+          <small class="muted">© <%= new Date().getFullYear() %> <%= siteName %></small>
+          <small class="muted">Luxury Admin UI</small>
+        </div>
+      </footer>
+
+    </div>
+
+  </div>
+
+  <!-- Mobile bottom nav (super usable) -->
+  <nav class="adm-bottom" aria-label="Admin bottom navigation">
+    <a class="<%= activeNav==='dashboard'?'active':'' %>" href="/admin"><span>⌁</span><em>Dash</em></a>
+    <a class="<%= activeNav==='posts'?'active':'' %>" href="/admin/posts"><span>▦</span><em>Posts</em></a>
+    <a class="<%= activeNav==='settings'?'active':'' %>" href="/admin/settings"><span>⚙</span><em>Set</em></a>
+    <a class="<%= activeNav==='public'?'active':'' %>" href="/admin/public"><span>⛭</span><em>Pub</em></a>
+  </nav>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-  <script src="/ui.js"></script>
+
+  <script>
+    (function(){
+      const burger = document.getElementById("admBurger");
+      const side = document.getElementById("admSide");
+      const backdrop = document.getElementById("admBackdrop");
+
+      function openSide(){
+        document.body.classList.add("adm-side-open");
+        if (backdrop) backdrop.hidden = false;
+        if (burger) burger.setAttribute("aria-expanded","true");
+      }
+      function closeSide(){
+        document.body.classList.remove("adm-side-open");
+        if (backdrop) backdrop.hidden = true;
+        if (burger) burger.setAttribute("aria-expanded","false");
+      }
+
+      if (burger) burger.addEventListener("click", () => {
+        document.body.classList.contains("adm-side-open") ? closeSide() : openSide();
+      });
+
+      if (backdrop) backdrop.addEventListener("click", closeSide);
+
+      // close on escape
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeSide();
+      });
+    })();
+  </script>
+
 </body>
 </html>
