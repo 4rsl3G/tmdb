@@ -13,100 +13,60 @@
       <div class="adm-metrics">
         <div class="adm-metric">
           <div class="adm-metric-k muted">Total Posts</div>
-          <div class="adm-metric-v"><%= stats?.postsCount ?? (postsCount ?? 0) %></div>
+          <div class="adm-metric-v"><%= count || 0 %></div>
         </div>
         <div class="adm-metric">
-          <div class="adm-metric-k muted">Last Cron</div>
-          <div class="adm-metric-v"><%= stats?.lastCron || "—" %></div>
+          <div class="adm-metric-k muted">Published</div>
+          <div class="adm-metric-v"><%= pub || 0 %></div>
         </div>
         <div class="adm-metric">
-          <div class="adm-metric-k muted">TMDB</div>
-          <div class="adm-metric-v"><%= stats?.tmdbStatus || "OK" %></div>
+          <div class="adm-metric-k muted">Draft</div>
+          <div class="adm-metric-v"><%= draft || 0 %></div>
         </div>
       </div>
 
       <div class="adm-divider"></div>
 
       <div class="adm-row">
-        <a class="adm-btn adm-btn-ghost" href="/admin/posts">Manage Posts</a>
-        <a class="adm-btn adm-btn-ghost" href="/admin/settings">Settings</a>
+        <a class="adm-btn adm-btn-ghost" href="<%= (typeof adminPath !== 'undefined' && adminPath) ? adminPath : '' %>/posts">Manage Posts</a>
+        <a class="adm-btn adm-btn-ghost" href="<%= (typeof adminPath !== 'undefined' && adminPath) ? adminPath : '' %>/settings">Settings</a>
       </div>
     </div>
 
     <div class="adm-card shine">
       <div class="adm-card-top">
         <div>
-          <div class="adm-card-k muted">Quick Actions</div>
-          <div class="adm-card-v">Control</div>
+          <div class="adm-card-k muted">System</div>
+          <div class="adm-card-v">Status</div>
         </div>
-        <span class="adm-chip">TOOLS</span>
+        <span class="adm-chip">AUTO</span>
       </div>
 
       <div class="adm-quick">
-        <a class="adm-quick-item" href="/admin/posts">
-          <div class="adm-quick-ic">▦</div>
+        <div class="adm-quick-item" style="cursor:default;">
+          <div class="adm-quick-ic">⚡</div>
           <div>
-            <div class="adm-quick-t">Posts</div>
-            <div class="adm-quick-d muted">View latest / bulk ops</div>
+            <div class="adm-quick-t">Cron Import</div>
+            <div class="adm-quick-d muted"><%= (s && s.auto_import_cron) ? s.auto_import_cron : "Configured in Settings" %></div>
           </div>
-        </a>
+        </div>
 
-        <a class="adm-quick-item" href="/admin/settings">
-          <div class="adm-quick-ic">⚙</div>
+        <div class="adm-quick-item" style="cursor:default;">
+          <div class="adm-quick-ic">🔑</div>
           <div>
-            <div class="adm-quick-t">Settings</div>
-            <div class="adm-quick-d muted">Keys, smartlinks, SEO</div>
+            <div class="adm-quick-t">TMDB Key</div>
+            <div class="adm-quick-d muted"><%= (s && s.tmdb_api_key) ? "Set" : "Empty" %></div>
           </div>
-        </a>
+        </div>
 
-        <a class="adm-quick-item" href="/admin/public">
-          <div class="adm-quick-ic">⛭</div>
+        <a class="adm-quick-item" href="/" target="_blank" rel="noopener">
+          <div class="adm-quick-ic">↗</div>
           <div>
-            <div class="adm-quick-t">Public</div>
-            <div class="adm-quick-d muted">Homepage config</div>
+            <div class="adm-quick-t">Open Public</div>
+            <div class="adm-quick-d muted">Preview public website</div>
           </div>
         </a>
       </div>
-    </div>
-  </div>
-
-  <div class="adm-card mt-3 shine">
-    <div class="adm-card-top">
-      <div>
-        <div class="adm-card-k muted">System</div>
-        <div class="adm-card-v">Latest Activity</div>
-      </div>
-      <span class="pill pill-hot"><span class="miniDot"></span>Pro</span>
-    </div>
-
-    <div class="adm-table-wrap">
-      <table class="adm-table">
-        <thead>
-          <tr>
-            <th>Item</th>
-            <th>Status</th>
-            <th class="text-end">Time</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% (activity || []).slice(0,10).forEach(a => { %>
-            <tr>
-              <td>
-                <div class="adm-td-main"><%= a.title || a.item || "—" %></div>
-                <div class="adm-td-sub muted"><%= a.desc || "" %></div>
-              </td>
-              <td><span class="adm-tag"><%= a.status || "OK" %></span></td>
-              <td class="text-end muted"><%= a.time || "" %></td>
-            </tr>
-          <% }) %>
-
-          <% if (!activity || activity.length === 0) { %>
-            <tr>
-              <td colspan="3" class="muted">No activity yet.</td>
-            </tr>
-          <% } %>
-        </tbody>
-      </table>
     </div>
   </div>
 
