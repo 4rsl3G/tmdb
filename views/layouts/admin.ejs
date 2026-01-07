@@ -4,7 +4,12 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
 
-  <title><%= pageTitle ? (pageTitle + " • Admin • " + siteName) : ("Admin • " + siteName) %></title>
+  <% const _siteName = (typeof siteName !== "undefined" && siteName) ? siteName : "P A N S A"; %>
+  <% const _pageTitle = (typeof pageTitle !== "undefined" && pageTitle) ? pageTitle : null; %>
+  <% const _accent = (typeof accentHex !== "undefined" && accentHex) ? accentHex : "#39ff9b"; %>
+  <% const _adminBase = (typeof adminPath !== "undefined" && adminPath) ? adminPath : "/admin"; %>
+
+  <title><%= _pageTitle ? (_pageTitle + " • Admin • " + _siteName) : ("Admin • " + _siteName) %></title>
   <meta name="robots" content="noindex,nofollow"/>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,48 +21,39 @@
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 
   <link rel="stylesheet" href="/admin.css"/>
-  <style>:root{--brand:<%= accentHex || "#39ff9b" %>;} </style>
+  <style>:root{--brand:<%= _accent %>;} </style>
 </head>
 
-<body class="is-admin">
+<body class="is-admin" data-admin-base="<%= _adminBase %>">
 
-  <!-- Premium background -->
   <div class="adm-bg" aria-hidden="true">
     <div class="adm-noise" aria-hidden="true"></div>
     <div class="adm-vignette" aria-hidden="true"></div>
   </div>
 
-  <!-- Mobile/All: sidebar drawer backdrop -->
   <div class="adm-backdrop" id="admBackdrop" hidden></div>
 
   <div class="adm-shell">
 
-    <!-- Sidebar (always exists) -->
     <aside class="adm-side" id="admSide">
       <div class="adm-side-top">
-        <a class="adm-brand" href="/admin">
+        <a class="adm-brand" href="<%= _adminBase %>">
           <span class="adm-dot"></span>
-          <span class="adm-brand-name"><%= siteName %></span>
+          <span class="adm-brand-name"><%= _siteName %></span>
           <span class="adm-chip">ADMIN</span>
         </a>
-
-        <div class="adm-side-sub muted">
-          Control Center
-        </div>
+        <div class="adm-side-sub muted">Control Center</div>
       </div>
 
       <nav class="adm-nav" aria-label="Admin navigation">
-        <a class="adm-item <%= activeNav==='dashboard'?'active':'' %>" href="/admin">
+        <a class="adm-item <%= (typeof activeNav !== "undefined" && activeNav==='dashboard')?'active':'' %>" href="<%= _adminBase %>">
           <span class="adm-ic">⌁</span><span>Dashboard</span>
         </a>
-        <a class="adm-item <%= activeNav==='posts'?'active':'' %>" href="/admin/posts">
+        <a class="adm-item <%= (typeof activeNav !== "undefined" && activeNav==='posts')?'active':'' %>" href="<%= _adminBase %>/posts">
           <span class="adm-ic">▦</span><span>Posts</span>
         </a>
-        <a class="adm-item <%= activeNav==='settings'?'active':'' %>" href="/admin/settings">
+        <a class="adm-item <%= (typeof activeNav !== "undefined" && activeNav==='settings')?'active':'' %>" href="<%= _adminBase %>/settings">
           <span class="adm-ic">⚙</span><span>Settings</span>
-        </a>
-        <a class="adm-item <%= activeNav==='public'?'active':'' %>" href="/admin/public">
-          <span class="adm-ic">⛭</span><span>Public</span>
         </a>
 
         <div class="adm-divider"></div>
@@ -66,13 +62,11 @@
           <span class="adm-ic">↗</span><span>Open Public</span>
         </a>
 
-        <% if (user) { %>
-          <form method="POST" action="/admin/logout" class="adm-logout">
-            <button class="adm-item adm-item-danger" type="submit">
-              <span class="adm-ic">⟲</span><span>Logout</span>
-            </button>
-          </form>
-        <% } %>
+        <form method="POST" action="<%= _adminBase %>/logout" class="adm-logout">
+          <button class="adm-item adm-item-danger" type="submit">
+            <span class="adm-ic">⟲</span><span>Logout</span>
+          </button>
+        </form>
       </nav>
 
       <div class="adm-side-foot">
@@ -85,10 +79,7 @@
       </div>
     </aside>
 
-    <!-- Main area -->
     <div class="adm-main">
-
-      <!-- Topbar -->
       <header class="adm-top">
         <div class="adm-top-inner container-fluid">
           <button class="adm-burger" id="admBurger" type="button" aria-label="Open sidebar" aria-expanded="false">
@@ -96,8 +87,8 @@
           </button>
 
           <div class="adm-title">
-            <div class="adm-title-k"><%= pageTitle || "Admin" %></div>
-            <div class="adm-title-v muted">Premium control with ultra motion</div>
+            <div class="adm-title-k"><%= _pageTitle || "Admin" %></div>
+            <div class="adm-title-v muted">Premium control panel</div>
           </div>
 
           <div class="adm-actions">
@@ -109,15 +100,7 @@
         </div>
       </header>
 
-      <!-- Content -->
       <main class="adm-content container-fluid" id="admin-root" role="main">
-        <% if (flash?.error) { %>
-          <div class="adm-alert adm-alert-danger"><%= flash.error %></div>
-        <% } %>
-        <% if (flash?.success) { %>
-          <div class="adm-alert adm-alert-success"><%= flash.success %></div>
-        <% } %>
-
         <div class="adm-surface">
           <%- body %>
         </div>
@@ -125,54 +108,22 @@
 
       <footer class="adm-footer container-fluid">
         <div class="adm-footer-inner">
-          <small class="muted">© <%= new Date().getFullYear() %> <%= siteName %></small>
+          <small class="muted">© <%= new Date().getFullYear() %> <%= _siteName %></small>
           <small class="muted">Luxury Admin UI</small>
         </div>
       </footer>
-
     </div>
 
   </div>
 
-  <!-- Mobile bottom nav (super usable) -->
   <nav class="adm-bottom" aria-label="Admin bottom navigation">
-    <a class="<%= activeNav==='dashboard'?'active':'' %>" href="/admin"><span>⌁</span><em>Dash</em></a>
-    <a class="<%= activeNav==='posts'?'active':'' %>" href="/admin/posts"><span>▦</span><em>Posts</em></a>
-    <a class="<%= activeNav==='settings'?'active':'' %>" href="/admin/settings"><span>⚙</span><em>Set</em></a>
-    <a class="<%= activeNav==='public'?'active':'' %>" href="/admin/public"><span>⛭</span><em>Pub</em></a>
+    <a class="<%= (typeof activeNav !== "undefined" && activeNav==='dashboard')?'active':'' %>" href="<%= _adminBase %>"><span>⌁</span><em>Dash</em></a>
+    <a class="<%= (typeof activeNav !== "undefined" && activeNav==='posts')?'active':'' %>" href="<%= _adminBase %>/posts"><span>▦</span><em>Posts</em></a>
+    <a class="<%= (typeof activeNav !== "undefined" && activeNav==='settings')?'active':'' %>" href="<%= _adminBase %>/settings"><span>⚙</span><em>Set</em></a>
+    <a href="/" target="_blank" rel="noopener"><span>↗</span><em>Public</em></a>
   </nav>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script>
-    (function(){
-      const burger = document.getElementById("admBurger");
-      const side = document.getElementById("admSide");
-      const backdrop = document.getElementById("admBackdrop");
-
-      function openSide(){
-        document.body.classList.add("adm-side-open");
-        if (backdrop) backdrop.hidden = false;
-        if (burger) burger.setAttribute("aria-expanded","true");
-      }
-      function closeSide(){
-        document.body.classList.remove("adm-side-open");
-        if (backdrop) backdrop.hidden = true;
-        if (burger) burger.setAttribute("aria-expanded","false");
-      }
-
-      if (burger) burger.addEventListener("click", () => {
-        document.body.classList.contains("adm-side-open") ? closeSide() : openSide();
-      });
-
-      if (backdrop) backdrop.addEventListener("click", closeSide);
-
-      // close on escape
-      window.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") closeSide();
-      });
-    })();
-  </script>
-
+  <script src="/ui.js"></script>
 </body>
 </html>
