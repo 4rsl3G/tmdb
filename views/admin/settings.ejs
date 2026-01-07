@@ -1,88 +1,153 @@
 <div class="adm-page">
 
+  <% if (saved) { %>
+    <div class="adm-alert adm-alert-success">Settings saved ✅</div>
+  <% } %>
+
   <div class="adm-grid-2">
+
+    <!-- CORE -->
     <div class="adm-card shine">
       <div class="adm-card-top">
         <div>
           <div class="adm-card-k muted">Core</div>
-          <div class="adm-card-v">Website Settings</div>
+          <div class="adm-card-v">Website</div>
         </div>
-        <span class="adm-chip">CONFIG</span>
+        <span class="adm-chip">CORE</span>
       </div>
 
-      <form method="POST" action="/admin/settings" class="adm-form mt-2">
+      <form method="POST" action="<%= (typeof adminPath !== 'undefined' && adminPath) ? adminPath : '' %>/settings" class="adm-form mt-2">
         <div class="adm-field">
           <label class="adm-label">Site Name</label>
-          <input class="adm-input" type="text" name="siteName" value="<%= settings?.siteName || siteName || '' %>">
+          <input class="adm-input" name="site_name" value="<%= s.site_name || '' %>">
         </div>
 
         <div class="adm-field">
-          <label class="adm-label">Accent Color (Hex)</label>
-          <input class="adm-input" type="text" name="accentHex" value="<%= settings?.accentHex || accentHex || '#39ff9b' %>" placeholder="#39ff9b">
+          <label class="adm-label">Home Title</label>
+          <input class="adm-input" name="home_title" value="<%= s.home_title || '' %>">
         </div>
 
         <div class="adm-field">
-          <label class="adm-label">TMDB API Key</label>
-          <input class="adm-input" type="text" name="tmdbKey" value="<%= settings?.tmdbKey || '' %>" placeholder="TMDB key">
-          <div class="adm-help muted">Used by cron auto-fetch & post generator.</div>
+          <label class="adm-label">Home Description</label>
+          <input class="adm-input" name="home_desc" value="<%= s.home_desc || '' %>">
         </div>
 
-        <button class="adm-btn adm-btn-primary" type="submit">Save Settings</button>
+        <div class="adm-field">
+          <label class="adm-label">Accent Hex</label>
+          <input class="adm-input" name="accent_hex" value="<%= s.accent_hex || '#39ff9b' %>" placeholder="#39ff9b">
+        </div>
+
+        <div class="adm-divider"></div>
+
+        <div class="adm-field">
+          <label class="adm-label">Smartlink URL</label>
+          <input class="adm-input" name="smartlink_url" value="<%= s.smartlink_url || '' %>" placeholder="https://...">
+          <div class="adm-help muted">Used for redirect / monetization logic.</div>
+        </div>
+
+        <button class="adm-btn adm-btn-primary" type="submit">Save Core</button>
       </form>
     </div>
 
+    <!-- TMDB / IMPORT -->
     <div class="adm-card shine">
       <div class="adm-card-top">
         <div>
-          <div class="adm-card-k muted">Monetization</div>
-          <div class="adm-card-v">Smartlink</div>
+          <div class="adm-card-k muted">Import</div>
+          <div class="adm-card-v">TMDB + Auto</div>
         </div>
-        <span class="adm-chip">ADS</span>
+        <span class="adm-chip">AUTO</span>
       </div>
 
-      <form method="POST" action="/admin/settings/ads" class="adm-form mt-2">
+      <form method="POST" action="<%= (typeof adminPath !== 'undefined' && adminPath) ? adminPath : '' %>/settings" class="adm-form mt-2">
+        <!-- NOTE: harus include juga keys core supaya tidak kehapus jika route kamu selalu upsert semua keys -->
+        <input type="hidden" name="site_name" value="<%= s.site_name || '' %>">
+        <input type="hidden" name="home_title" value="<%= s.home_title || '' %>">
+        <input type="hidden" name="home_desc" value="<%= s.home_desc || '' %>">
+        <input type="hidden" name="accent_hex" value="<%= s.accent_hex || '#39ff9b' %>">
+        <input type="hidden" name="smartlink_url" value="<%= s.smartlink_url || '' %>">
+
         <div class="adm-field">
-          <label class="adm-label">Smartlink URL</label>
-          <input class="adm-input" type="text" name="smartlinkUrl" value="<%= settings?.smartlinkUrl || '' %>" placeholder="https://...">
-          <div class="adm-help muted">Used for first click redirect logic (if enabled).</div>
+          <label class="adm-label">TMDB API Key</label>
+          <input class="adm-input" name="tmdb_api_key" value="<%= s.tmdb_api_key || '' %>">
+        </div>
+
+        <div class="adm-grid-2">
+          <div class="adm-field">
+            <label class="adm-label">Language</label>
+            <input class="adm-input" name="tmdb_lang" value="<%= s.tmdb_lang || 'en-US' %>" placeholder="en-US">
+          </div>
+          <div class="adm-field">
+            <label class="adm-label">Region</label>
+            <input class="adm-input" name="tmdb_region" value="<%= s.tmdb_region || 'US' %>" placeholder="US">
+          </div>
         </div>
 
         <div class="adm-field">
-          <label class="adm-label">Enable Smartlink Only</label>
-          <select class="adm-input" name="smartlinkOnly">
-            <option value="1" <%= (settings?.smartlinkOnly ? "selected" : "") %>>Enabled</option>
-            <option value="0" <%= (!settings?.smartlinkOnly ? "selected" : "") %>>Disabled</option>
+          <label class="adm-label">Auto Import Cron</label>
+          <input class="adm-input" name="auto_import_cron" value="<%= s.auto_import_cron || '*/30 * * * *' %>">
+          <div class="adm-help muted">Example: */30 * * * * (every 30 minutes)</div>
+        </div>
+
+        <div class="adm-grid-2">
+          <div class="adm-field">
+            <label class="adm-label">Import Source</label>
+            <select class="adm-input" name="import_source">
+              <option value="discover" <%= (s.import_source==='discover'?'selected':'') %>>discover</option>
+              <option value="trending" <%= (s.import_source==='trending'?'selected':'') %>>trending</option>
+              <option value="popular" <%= (s.import_source==='popular'?'selected':'') %>>popular</option>
+              <option value="top_rated" <%= (s.import_source==='top_rated'?'selected':'') %>>top_rated</option>
+            </select>
+          </div>
+          <div class="adm-field">
+            <label class="adm-label">Import Pages</label>
+            <input class="adm-input" name="import_pages" value="<%= s.import_pages || '1' %>">
+          </div>
+        </div>
+
+        <div class="adm-field">
+          <label class="adm-label">Auto Publish</label>
+          <select class="adm-input" name="auto_publish">
+            <option value="1" <%= (String(s.auto_publish||'1')==='1'?'selected':'') %>>Yes</option>
+            <option value="0" <%= (String(s.auto_publish||'1')==='0'?'selected':'') %>>No</option>
           </select>
         </div>
 
-        <button class="adm-btn adm-btn-primary" type="submit">Save Ads</button>
+        <div class="adm-divider"></div>
+
+        <div class="adm-grid-2">
+          <div class="adm-field">
+            <label class="adm-label">Min Overview Length</label>
+            <input class="adm-input" name="min_overview_len" value="<%= s.min_overview_len || '120' %>">
+          </div>
+          <div class="adm-field">
+            <label class="adm-label">Min Vote Count</label>
+            <input class="adm-input" name="min_vote_count" value="<%= s.min_vote_count || '50' %>">
+          </div>
+        </div>
+
+        <div class="adm-grid-2">
+          <div class="adm-field">
+            <label class="adm-label">Require Poster</label>
+            <select class="adm-input" name="require_poster">
+              <option value="1" <%= (String(s.require_poster||'1')==='1'?'selected':'') %>>Yes</option>
+              <option value="0" <%= (String(s.require_poster||'1')==='0'?'selected':'') %>>No</option>
+            </select>
+          </div>
+          <div class="adm-field">
+            <label class="adm-label">Min Vote Average</label>
+            <input class="adm-input" name="min_vote_average" value="<%= s.min_vote_average || '' %>" placeholder="optional">
+            <div class="adm-help muted">If you use this in cron, add to backend keys list too.</div>
+          </div>
+        </div>
+
+        <!-- keep keys existing in backend list -->
+        <input type="hidden" name="import_source" value="<%= s.import_source || 'discover' %>">
+
+        <button class="adm-btn adm-btn-primary" type="submit">Save Import</button>
       </form>
     </div>
-  </div>
 
-  <div class="adm-card mt-3 shine">
-    <div class="adm-card-top">
-      <div>
-        <div class="adm-card-k muted">SEO</div>
-        <div class="adm-card-v">Meta Defaults</div>
-      </div>
-      <span class="adm-chip">SEO</span>
-    </div>
-
-    <form method="POST" action="/admin/settings/seo" class="adm-form mt-2">
-      <div class="adm-grid-2">
-        <div class="adm-field">
-          <label class="adm-label">Home Title</label>
-          <input class="adm-input" type="text" name="homeTitle" value="<%= settings?.homeTitle || '' %>">
-        </div>
-        <div class="adm-field">
-          <label class="adm-label">Home Description</label>
-          <input class="adm-input" type="text" name="homeDesc" value="<%= settings?.homeDesc || '' %>">
-        </div>
-      </div>
-
-      <button class="adm-btn adm-btn-primary" type="submit">Save SEO</button>
-    </form>
   </div>
 
 </div>
